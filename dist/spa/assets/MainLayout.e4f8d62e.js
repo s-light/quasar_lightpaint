@@ -1,4 +1,5 @@
-import { t as createComponent, c as computed, h, y as hSlot, D as useRouterLinkProps, E as useRouterLink, r as ref, G as isKeyCode, H as stopAndPrevent, I as hUniqueSlot, g as getCurrentInstance, J as onBeforeUnmount, K as History, w as watch, L as vmHasRouter, o as onMounted, M as nextTick, N as css, O as getElement, P as client, Q as listenOpts, R as getEventPath, S as onDeactivated, U as vmIsDestroyed, V as Platform, W as createDirective, X as noop, Y as leftClick, Z as addEvt, _ as preventDraggable, $ as prevent, a0 as stop, a1 as position, a2 as cleanEvt, i as inject, u as emptyRenderFn, a3 as withDirectives, a4 as hDir, v as layoutKey, a5 as provide, x as pageContainerKey, a6 as isRuntimeSsrPreHydration, a7 as reactive, a as onUnmounted, a8 as hMergeSlot, a9 as childrenCommon, k as openBlock, l as createElementBlock, aa as renderList, F as Fragment, n as createBlock, p as withCtx, f as createVNode, ab as QIcon, C as createTextVNode, z as toDisplayString, ac as resolveComponent, ad as QBtn, B as unref, m as createBaseVNode } from "./index.ac0898f0.js";
+import { p as createComponent, c as computed, h, l as hSlot, K as useRouterLinkProps, L as useRouterLink, r as ref, M as isKeyCode, n as stopAndPrevent, N as hUniqueSlot, g as getCurrentInstance, O as onBeforeUnmount, P as History, w as watch, R as vmHasRouter, o as onMounted, S as nextTick, U as css, V as getElement, W as client, X as listenOpts, Y as getEventPath, Z as onDeactivated, _ as vmIsDestroyed, $ as Platform, a0 as createDirective, a1 as noop, a2 as leftClick, a3 as addEvt, a4 as preventDraggable, a5 as prevent, a6 as stop, a7 as position, a8 as cleanEvt, i as inject, E as emptyRenderFn, a9 as withDirectives, aa as hDir, G as layoutKey, ab as provide, H as pageContainerKey, ac as isRuntimeSsrPreHydration, ad as reactive, a as onUnmounted, k as hMergeSlot, ae as childrenCommon, v as openBlock, x as createElementBlock, af as renderList, F as Fragment, D as createBlock, y as withCtx, f as createVNode, Q as QIcon, z as createTextVNode, I as toDisplayString, ag as resolveComponent, B as QBtn, J as unref, C as createBaseVNode } from "./index.1e817aca.js";
+import { a as useDarkProps, u as useDark } from "./use-dark.e4ccecd2.js";
 var QItemSection = createComponent({
   name: "QItemSection",
   props: {
@@ -15,15 +16,6 @@ var QItemSection = createComponent({
     return () => h("div", { class: classes.value }, hSlot(slots.default));
   }
 });
-const useDarkProps = {
-  dark: {
-    type: Boolean,
-    default: null
-  }
-};
-function useDark(props, $q) {
-  return computed(() => props.dark === null ? $q.dark.isActive : props.dark);
-}
 var QItem = createComponent({
   name: "QItem",
   props: {
