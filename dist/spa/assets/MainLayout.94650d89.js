@@ -1,5 +1,5 @@
-import { p as createComponent, c as computed, h, l as hSlot, K as useRouterLinkProps, L as useRouterLink, r as ref, M as isKeyCode, n as stopAndPrevent, N as hUniqueSlot, g as getCurrentInstance, O as onBeforeUnmount, P as History, w as watch, R as vmHasRouter, o as onMounted, S as nextTick, U as css, V as getElement, W as client, X as listenOpts, Y as getEventPath, Z as onDeactivated, _ as vmIsDestroyed, $ as Platform, a0 as createDirective, a1 as noop, a2 as leftClick, a3 as addEvt, a4 as preventDraggable, a5 as prevent, a6 as stop, a7 as position, a8 as cleanEvt, i as inject, E as emptyRenderFn, a9 as withDirectives, aa as hDir, G as layoutKey, ab as provide, H as pageContainerKey, ac as isRuntimeSsrPreHydration, ad as reactive, a as onUnmounted, k as hMergeSlot, ae as childrenCommon, v as openBlock, x as createElementBlock, af as renderList, F as Fragment, D as createBlock, y as withCtx, f as createVNode, Q as QIcon, z as createTextVNode, I as toDisplayString, ag as resolveComponent, B as QBtn, J as unref, C as createBaseVNode } from "./index.1e817aca.js";
-import { a as useDarkProps, u as useDark } from "./use-dark.e4ccecd2.js";
+import { p as createComponent, c as computed, h, l as hSlot, M as useRouterLinkProps, N as useRouterLink, r as ref, O as isKeyCode, n as stopAndPrevent, P as hUniqueSlot, g as getCurrentInstance, R as onBeforeUnmount, S as History, w as watch, U as vmHasRouter, o as onMounted, V as nextTick, W as css, X as getElement, Y as client, Z as listenOpts, _ as getEventPath, $ as onDeactivated, a0 as vmIsDestroyed, a1 as Platform, a2 as createDirective, a3 as noop, a4 as leftClick, a5 as addEvt, a6 as preventDraggable, a7 as prevent, a8 as stop, a9 as position, aa as cleanEvt, i as inject, G as emptyRenderFn, ab as withDirectives, ac as hDir, H as layoutKey, ad as provide, I as pageContainerKey, ae as isRuntimeSsrPreHydration, af as reactive, a as onUnmounted, k as hMergeSlot, ag as childrenCommon, y as openBlock, z as createElementBlock, ah as renderList, F as Fragment, E as createBlock, C as withCtx, f as createVNode, Q as QIcon, L as createTextVNode, J as toDisplayString, ai as resolveComponent, D as QBtn, K as unref, B as createBaseVNode } from "./index.29135efd.js";
+import { a as useDarkProps, u as useDark } from "./use-dark.1f461def.js";
 var QItemSection = createComponent({
   name: "QItemSection",
   props: {
@@ -1880,7 +1880,6 @@ const _sfc_main = Object.assign({
           createVNode(QDrawer, {
             modelValue: leftDrawerOpen.value,
             "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => leftDrawerOpen.value = $event),
-            "show-if-above": "",
             bordered: "",
             elevated: "",
             persistent: ""

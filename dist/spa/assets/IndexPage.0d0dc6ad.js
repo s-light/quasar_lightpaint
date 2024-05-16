@@ -1,6 +1,6 @@
-import { Q as QPage } from "./QPage.0b0ad0e4.js";
-import { i as inject, q as quasarKey, r as ref, c as computed, h, u as useSize, k as hMergeSlot, l as hSlot, m as useSizeProps, g as getCurrentInstance, t as toRaw, n as stopAndPrevent, p as createComponent, Q as QIcon, o as onMounted, w as watch, v as openBlock, x as createElementBlock, f as createVNode, y as withCtx, z as createTextVNode, B as QBtn, C as createBaseVNode, D as createBlock } from "./index.1e817aca.js";
-import { u as useDark, a as useDarkProps } from "./use-dark.e4ccecd2.js";
+import { Q as QPage } from "./QPage.e30fc9ad.js";
+import { i as inject, q as quasarKey, r as ref, c as computed, h, u as useSize, k as hMergeSlot, l as hSlot, m as useSizeProps, g as getCurrentInstance, t as toRaw, n as stopAndPrevent, p as createComponent, Q as QIcon, v as useSpinnerProps, x as useSpinner, o as onMounted, w as watch, y as openBlock, z as createElementBlock, B as createBaseVNode, f as createVNode, C as withCtx, D as QBtn, E as createBlock } from "./index.29135efd.js";
+import { u as useDark, a as useDarkProps } from "./use-dark.1f461def.js";
 function useQuasar() {
   return inject(quasarKey);
 }
@@ -240,6 +240,104 @@ var QToggle = createComponent({
     return useCheckbox("toggle", getInner);
   }
 });
+const svg = [
+  h("g", {
+    fill: "none",
+    "fill-rule": "evenodd",
+    transform: "translate(1 1)",
+    "stroke-width": "2"
+  }, [
+    h("circle", {
+      cx: "22",
+      cy: "22",
+      r: "6"
+    }, [
+      h("animate", {
+        attributeName: "r",
+        begin: "1.5s",
+        dur: "3s",
+        values: "6;22",
+        calcMode: "linear",
+        repeatCount: "indefinite"
+      }),
+      h("animate", {
+        attributeName: "stroke-opacity",
+        begin: "1.5s",
+        dur: "3s",
+        values: "1;0",
+        calcMode: "linear",
+        repeatCount: "indefinite"
+      }),
+      h("animate", {
+        attributeName: "stroke-width",
+        begin: "1.5s",
+        dur: "3s",
+        values: "2;0",
+        calcMode: "linear",
+        repeatCount: "indefinite"
+      })
+    ]),
+    h("circle", {
+      cx: "22",
+      cy: "22",
+      r: "6"
+    }, [
+      h("animate", {
+        attributeName: "r",
+        begin: "3s",
+        dur: "3s",
+        values: "6;22",
+        calcMode: "linear",
+        repeatCount: "indefinite"
+      }),
+      h("animate", {
+        attributeName: "stroke-opacity",
+        begin: "3s",
+        dur: "3s",
+        values: "1;0",
+        calcMode: "linear",
+        repeatCount: "indefinite"
+      }),
+      h("animate", {
+        attributeName: "stroke-width",
+        begin: "3s",
+        dur: "3s",
+        values: "2;0",
+        calcMode: "linear",
+        repeatCount: "indefinite"
+      })
+    ]),
+    h("circle", {
+      cx: "22",
+      cy: "22",
+      r: "8"
+    }, [
+      h("animate", {
+        attributeName: "r",
+        begin: "0s",
+        dur: "1.5s",
+        values: "6;1;2;3;4;5;6",
+        calcMode: "linear",
+        repeatCount: "indefinite"
+      })
+    ])
+  ])
+];
+var QSpinnerRings = createComponent({
+  name: "QSpinnerRings",
+  props: useSpinnerProps,
+  setup(props) {
+    const { cSize, classes } = useSpinner(props);
+    return () => h("svg", {
+      class: classes.value,
+      stroke: "currentColor",
+      width: cSize.value,
+      height: cSize.value,
+      viewBox: "0 0 45 45",
+      xmlns: "http://www.w3.org/2000/svg"
+    }, svg);
+  }
+});
 if (typeof HTMLVideoElement !== "undefined" && !("requestVideoFrameCallback" in HTMLVideoElement.prototype) && "getVideoPlaybackQuality" in HTMLVideoElement.prototype) {
   HTMLVideoElement.prototype._rvfcpolyfillmap = {};
   HTMLVideoElement.prototype.requestVideoFrameCallback = function(callback) {
@@ -275,9 +373,9 @@ if (typeof HTMLVideoElement !== "undefined" && !("requestVideoFrameCallback" in 
   };
 }
 var LightPaint_vue_vue_type_style_index_0_lang = "";
-const _hoisted_1 = /* @__PURE__ */ createBaseVNode("video", null, null, -1);
-const _hoisted_2 = /* @__PURE__ */ createBaseVNode("canvas", null, null, -1);
-const _hoisted_3 = /* @__PURE__ */ createBaseVNode("br", null, null, -1);
+const _hoisted_1 = { class: "flex-container" };
+const _hoisted_2 = /* @__PURE__ */ createBaseVNode("video", null, null, -1);
+const _hoisted_3 = /* @__PURE__ */ createBaseVNode("canvas", null, null, -1);
 const _sfc_main$1 = {
   __name: "LightPaint",
   setup(__props) {
@@ -286,9 +384,15 @@ const _sfc_main$1 = {
     const canvas = ref();
     const ctx = ref();
     const video = ref();
-    const video_stream = ref();
+    const media_stream = ref();
+    const video_track = ref();
     const video_active = ref(true);
     const paint_active = ref(false);
+    const video_constraints = {
+      width: { min: 640, ideal: 4e3 },
+      height: { min: 1e3, ideal: 2e3 },
+      frameRate: { max: 30 }
+    };
     onMounted(() => {
       console.log("onMounted");
       setup_canvas();
@@ -301,16 +405,22 @@ const _sfc_main$1 = {
       ctx.value = canvas.value.getContext("2d");
       console.log("canvas", canvas.value);
       console.log("ctx", ctx.value);
-      ctx.value.globalCompositeOperation = "lighten";
     }
     function clear_canvas() {
       console.log("clear_canvas");
       const compOp = ctx.value.globalCompositeOperation;
+      console.log("globalCompositeOperation", ctx.value.globalCompositeOperation);
       ctx.value.globalCompositeOperation = "source-over";
-      ctx.value.fillStyle = "#f0f";
-      ctx.value.fillRect(0, 0, 20, 20);
+      console.log("globalCompositeOperation", ctx.value.globalCompositeOperation);
+      ctx.value.fillStyle = "#000";
+      ctx.value.fillRect(0, 0, canvas.value.width, canvas.value.height);
       ctx.value.globalCompositeOperation = compOp;
+      console.log("globalCompositeOperation", ctx.value.globalCompositeOperation);
       console.log("clear_canvas done.");
+    }
+    function save_canvas() {
+      console.log("save_canvas");
+      console.log("TODO: please implement save!");
     }
     function setup_cam() {
       console.log("setup_cam");
@@ -326,17 +436,22 @@ const _sfc_main$1 = {
       }
     });
     function start_cam() {
-      navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function(stream) {
-        video_stream.value = stream;
-        console.log("video_stream", video_stream.value);
+      navigator.mediaDevices.getUserMedia({
+        video: video_constraints,
+        audio: false
+      }).then(function(stream) {
+        media_stream.value = stream;
+        console.log("media_stream", media_stream.value);
         video.value.srcObject = stream;
         video.value.play();
+        video_track.value = media_stream.value.getVideoTracks()[0];
+        console.log("video_track", video_track.value);
       }).catch(function(err) {
         console.log("An error occurred: " + err);
       });
     }
     function stop_cam() {
-      video_stream.value.getTracks().forEach((track) => {
+      media_stream.value.getTracks().forEach((track) => {
         if (track.readyState == "live") {
           track.stop();
         }
@@ -346,6 +461,11 @@ const _sfc_main$1 = {
     function video_load_callback() {
       console.log("video_load_callback");
       video.value.cancelVideoFrameCallback(animation_handle.value);
+      const track_settings = video_track.value.getSettings();
+      canvas.value.height = track_settings.height;
+      canvas.value.width = track_settings.width;
+      ctx.value.globalCompositeOperation = "lighten";
+      console.log("globalCompositeOperation", ctx.value.globalCompositeOperation);
       step();
     }
     function step() {
@@ -355,33 +475,55 @@ const _sfc_main$1 = {
       animation_handle.value = video.value.requestVideoFrameCallback(step);
     }
     return (_ctx, _cache) => {
-      return openBlock(), createElementBlock("div", null, [
-        _hoisted_1,
+      return openBlock(), createElementBlock("div", _hoisted_1, [
         _hoisted_2,
-        createVNode(QToggle, {
-          size: "5vh",
-          modelValue: video_active.value,
-          "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => video_active.value = $event),
-          icon: "videocam"
-        }, null, 8, ["modelValue"]),
-        createVNode(QToggle, {
-          size: "5vh",
-          modelValue: paint_active.value,
-          "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => paint_active.value = $event),
-          color: "pink",
-          icon: "emergency_recording"
-        }, null, 8, ["modelValue"]),
         _hoisted_3,
-        createVNode(QBtn, {
-          color: "primary",
-          icon: "deleteforever",
-          onClick: clear_canvas
-        }, {
-          default: withCtx(() => [
-            createTextVNode(" clear canvas ")
-          ]),
-          _: 1
-        })
+        createBaseVNode("section", null, [
+          createVNode(QToggle, {
+            size: "5vh",
+            modelValue: video_active.value,
+            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => video_active.value = $event),
+            icon: "videocam"
+          }, null, 8, ["modelValue"]),
+          createVNode(QToggle, {
+            size: "5vh",
+            modelValue: paint_active.value,
+            "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => paint_active.value = $event),
+            color: "pink",
+            icon: "emergency_recording"
+          }, null, 8, ["modelValue"]),
+          createVNode(QBtn, {
+            size: "2vh",
+            padding: "xs",
+            color: "negative",
+            round: "",
+            icon: "radio_button_checked",
+            loading: paint_active.value,
+            onMousedown: _cache[2] || (_cache[2] = ($event) => paint_active.value = true),
+            onMouseup: _cache[3] || (_cache[3] = ($event) => paint_active.value = false)
+          }, {
+            loading: withCtx(() => [
+              createVNode(QSpinnerRings)
+            ]),
+            _: 1
+          }, 8, ["loading"]),
+          createVNode(QBtn, {
+            size: "2vh",
+            padding: "xs",
+            color: "primary",
+            round: "",
+            icon: "delete_forever",
+            onClick: clear_canvas
+          }),
+          createVNode(QBtn, {
+            size: "2vh",
+            padding: "xs",
+            color: "primary",
+            round: "",
+            icon: "save",
+            onClick: save_canvas
+          })
+        ])
       ]);
     };
   }
