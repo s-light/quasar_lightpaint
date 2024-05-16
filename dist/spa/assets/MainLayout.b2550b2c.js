@@ -1,5 +1,5 @@
-import { p as createComponent, c as computed, h, l as hSlot, M as useRouterLinkProps, N as useRouterLink, r as ref, O as isKeyCode, n as stopAndPrevent, P as hUniqueSlot, g as getCurrentInstance, R as onBeforeUnmount, S as History, w as watch, U as vmHasRouter, o as onMounted, V as nextTick, W as css, X as getElement, Y as client, Z as listenOpts, _ as getEventPath, $ as onDeactivated, a0 as vmIsDestroyed, a1 as Platform, a2 as createDirective, a3 as noop, a4 as leftClick, a5 as addEvt, a6 as preventDraggable, a7 as prevent, a8 as stop, a9 as position, aa as cleanEvt, i as inject, G as emptyRenderFn, ab as withDirectives, ac as hDir, H as layoutKey, ad as provide, I as pageContainerKey, ae as isRuntimeSsrPreHydration, af as reactive, a as onUnmounted, k as hMergeSlot, ag as childrenCommon, y as openBlock, z as createElementBlock, ah as renderList, F as Fragment, E as createBlock, C as withCtx, f as createVNode, Q as QIcon, L as createTextVNode, J as toDisplayString, ai as resolveComponent, D as QBtn, K as unref, B as createBaseVNode } from "./index.2c8d46fc.js";
-import { a as useDarkProps, u as useDark } from "./use-dark.e3a0149a.js";
+import { G as createComponent, c as computed, h, B as hSlot, ae as useRouterLinkProps, af as useRouterLink, r as ref, I as isKeyCode, E as stopAndPrevent, ag as hUniqueSlot, g as getCurrentInstance, M as onBeforeUnmount, ah as History, Y as client, O as listenOpts, ai as getEventPath, aj as createDirective, ak as noop, al as leftClick, L as addEvt, am as preventDraggable, J as prevent, an as stop, ao as position, N as cleanEvt, i as inject, a7 as emptyRenderFn, w as watch, o as onMounted, K as nextTick, ap as withDirectives, aq as hDir, a8 as layoutKey, ar as provide, a9 as pageContainerKey, as as isRuntimeSsrPreHydration, at as reactive, a as onUnmounted, z as hMergeSlot, au as childrenCommon, m as openBlock, n as createElementBlock, p as renderList, F as Fragment, a6 as createBlock, a2 as withCtx, f as createVNode, H as QIcon, a3 as createTextVNode, v as toDisplayString, av as resolveComponent, Q as QBtn, x as unref, u as createBaseVNode } from "./index.f4b60239.js";
+import { a as useDarkProps, u as useDark, j as getHorizontalScrollPosition, k as getVerticalScrollPosition, l as hasScrollbar, b as clearSelection, d as useModelToggleProps, e as useModelToggleEmits, f as useTimeout, h as useModelToggle, m as between, s as scrollTargetProp, i as getScrollTarget, g as getScrollbarWidth, _ as _export_sfc } from "./scroll.fee10664.js";
 var QItemSection = createComponent({
   name: "QItemSection",
   props: {
@@ -184,177 +184,6 @@ function useHistory(showing, hide, hideOnRouteChange) {
     }
   };
 }
-const useModelToggleProps = {
-  modelValue: {
-    type: Boolean,
-    default: null
-  },
-  "onUpdate:modelValue": [Function, Array]
-};
-const useModelToggleEmits = [
-  "beforeShow",
-  "show",
-  "beforeHide",
-  "hide"
-];
-function useModelToggle({
-  showing,
-  canShow,
-  hideOnRouteChange,
-  handleShow,
-  handleHide,
-  processOnMount
-}) {
-  const vm = getCurrentInstance();
-  const { props, emit, proxy } = vm;
-  let payload;
-  function toggle(evt) {
-    if (showing.value === true) {
-      hide(evt);
-    } else {
-      show(evt);
-    }
-  }
-  function show(evt) {
-    if (props.disable === true || evt !== void 0 && evt.qAnchorHandled === true || canShow !== void 0 && canShow(evt) !== true) {
-      return;
-    }
-    const listener = props["onUpdate:modelValue"] !== void 0;
-    if (listener === true && true) {
-      emit("update:modelValue", true);
-      payload = evt;
-      nextTick(() => {
-        if (payload === evt) {
-          payload = void 0;
-        }
-      });
-    }
-    if (props.modelValue === null || listener === false || false) {
-      processShow(evt);
-    }
-  }
-  function processShow(evt) {
-    if (showing.value === true) {
-      return;
-    }
-    showing.value = true;
-    emit("beforeShow", evt);
-    if (handleShow !== void 0) {
-      handleShow(evt);
-    } else {
-      emit("show", evt);
-    }
-  }
-  function hide(evt) {
-    if (props.disable === true) {
-      return;
-    }
-    const listener = props["onUpdate:modelValue"] !== void 0;
-    if (listener === true && true) {
-      emit("update:modelValue", false);
-      payload = evt;
-      nextTick(() => {
-        if (payload === evt) {
-          payload = void 0;
-        }
-      });
-    }
-    if (props.modelValue === null || listener === false || false) {
-      processHide(evt);
-    }
-  }
-  function processHide(evt) {
-    if (showing.value === false) {
-      return;
-    }
-    showing.value = false;
-    emit("beforeHide", evt);
-    if (handleHide !== void 0) {
-      handleHide(evt);
-    } else {
-      emit("hide", evt);
-    }
-  }
-  function processModelChange(val) {
-    if (props.disable === true && val === true) {
-      if (props["onUpdate:modelValue"] !== void 0) {
-        emit("update:modelValue", false);
-      }
-    } else if (val === true !== showing.value) {
-      const fn = val === true ? processShow : processHide;
-      fn(payload);
-    }
-  }
-  watch(() => props.modelValue, processModelChange);
-  if (hideOnRouteChange !== void 0 && vmHasRouter(vm) === true) {
-    watch(() => proxy.$route.fullPath, () => {
-      if (hideOnRouteChange.value === true && showing.value === true) {
-        hide();
-      }
-    });
-  }
-  processOnMount === true && onMounted(() => {
-    processModelChange(props.modelValue);
-  });
-  const publicMethods = { show, hide, toggle };
-  Object.assign(proxy, publicMethods);
-  return publicMethods;
-}
-const scrollTargetProp = [Element, String];
-const scrollTargets = [null, document, document.body, document.scrollingElement, document.documentElement];
-function getScrollTarget(el, targetEl) {
-  let target = getElement(targetEl);
-  if (target === void 0) {
-    if (el === void 0 || el === null) {
-      return window;
-    }
-    target = el.closest(".scroll,.scroll-y,.overflow-auto");
-  }
-  return scrollTargets.includes(target) ? window : target;
-}
-function getVerticalScrollPosition(scrollTarget) {
-  return scrollTarget === window ? window.pageYOffset || window.scrollY || document.body.scrollTop || 0 : scrollTarget.scrollTop;
-}
-function getHorizontalScrollPosition(scrollTarget) {
-  return scrollTarget === window ? window.pageXOffset || window.scrollX || document.body.scrollLeft || 0 : scrollTarget.scrollLeft;
-}
-let size;
-function getScrollbarWidth() {
-  if (size !== void 0) {
-    return size;
-  }
-  const inner = document.createElement("p"), outer = document.createElement("div");
-  css(inner, {
-    width: "100%",
-    height: "200px"
-  });
-  css(outer, {
-    position: "absolute",
-    top: "0px",
-    left: "0px",
-    visibility: "hidden",
-    width: "200px",
-    height: "150px",
-    overflow: "hidden"
-  });
-  outer.appendChild(inner);
-  document.body.appendChild(outer);
-  const w1 = inner.offsetWidth;
-  outer.style.overflow = "scroll";
-  let w2 = inner.offsetWidth;
-  if (w1 === w2) {
-    w2 = outer.clientWidth;
-  }
-  outer.remove();
-  size = w1 - w2;
-  return size;
-}
-function hasScrollbar(el, onY = true) {
-  if (!el || el.nodeType !== Node.ELEMENT_NODE) {
-    return false;
-  }
-  return onY ? el.scrollHeight > el.clientHeight && (el.classList.contains("scroll") || el.classList.contains("overflow-auto") || ["auto", "scroll"].includes(window.getComputedStyle(el)["overflow-y"])) : el.scrollWidth > el.clientWidth && (el.classList.contains("scroll") || el.classList.contains("overflow-auto") || ["auto", "scroll"].includes(window.getComputedStyle(el)["overflow-x"]));
-}
 let registered = 0, scrollPositionX, scrollPositionY, maxScrollTop, vpPendingUpdate = false, bodyLeft, bodyTop, href, closeTimer = null;
 function onWheel(e) {
   if (shouldPreventScroll(e)) {
@@ -493,30 +322,6 @@ function usePreventScroll() {
     }
   };
 }
-function useTimeout() {
-  let timer = null;
-  const vm = getCurrentInstance();
-  function removeTimeout() {
-    if (timer !== null) {
-      clearTimeout(timer);
-      timer = null;
-    }
-  }
-  onDeactivated(removeTimeout);
-  onBeforeUnmount(removeTimeout);
-  return {
-    removeTimeout,
-    registerTimeout(fn, delay) {
-      removeTimeout();
-      if (vmIsDestroyed(vm) === false) {
-        timer = setTimeout(() => {
-          timer = null;
-          fn();
-        }, delay);
-      }
-    }
-  };
-}
 const modifiersAll = {
   left: true,
   right: true,
@@ -555,19 +360,6 @@ function getModifierDirections(mod) {
 const avoidNodeNamesList = ["INPUT", "TEXTAREA"];
 function shouldStart(evt, ctx) {
   return ctx.event === void 0 && evt.target !== void 0 && evt.target.draggable !== true && typeof ctx.handler === "function" && avoidNodeNamesList.includes(evt.target.nodeName.toUpperCase()) === false && (evt.qClonedBy === void 0 || evt.qClonedBy.indexOf(ctx.uid) === -1);
-}
-function clearSelection() {
-  if (window.getSelection !== void 0) {
-    const selection = window.getSelection();
-    if (selection.empty !== void 0) {
-      selection.empty();
-    } else if (selection.removeAllRanges !== void 0) {
-      selection.removeAllRanges();
-      Platform.is.mobile !== true && selection.addRange(document.createRange());
-    }
-  } else if (document.selection !== void 0) {
-    document.selection.empty();
-  }
 }
 function getChanges(evt, ctx, isFinal) {
   const pos = position(evt);
@@ -873,9 +665,6 @@ var TouchPan = createDirective(
     }
   }
 );
-function between(v, min, max) {
-  return max <= min ? min : Math.min(max, Math.max(min, v));
-}
 const duration = 150;
 var QDrawer = createComponent({
   name: "QDrawer",
@@ -940,7 +729,7 @@ var QDrawer = createComponent({
     const isMini = computed(
       () => props.mini === true && belowBreakpoint.value !== true
     );
-    const size2 = computed(() => isMini.value === true ? props.miniWidth : props.width);
+    const size = computed(() => isMini.value === true ? props.miniWidth : props.width);
     const showing = ref(
       props.showIfAbove === true && belowBreakpoint.value === false ? true : props.modelValue === true
     );
@@ -971,7 +760,7 @@ var QDrawer = createComponent({
       removeFromHistory();
       evt !== false && $layout.animate();
       applyBackdrop(0);
-      applyPosition(stateDirection.value * size2.value);
+      applyPosition(stateDirection.value * size.value);
       cleanup();
       if (noEvent !== true) {
         registerTimeout(() => {
@@ -1000,10 +789,10 @@ var QDrawer = createComponent({
     const flagPanning = ref(false);
     const flagMiniAnimate = ref(false);
     const flagContentPosition = ref(
-      size2.value * stateDirection.value
+      size.value * stateDirection.value
     );
     const otherSide = computed(() => rightSide.value === true ? "left" : "right");
-    const offset = computed(() => showing.value === true && belowBreakpoint.value === false && props.overlay === false ? props.miniToOverlay === true ? props.miniWidth : size2.value : 0);
+    const offset = computed(() => showing.value === true && belowBreakpoint.value === false && props.overlay === false ? props.miniToOverlay === true ? props.miniWidth : size.value : 0);
     const fixed = computed(
       () => props.overlay === true || props.miniToOverlay === true || $layout.view.value.indexOf(rightSide.value ? "R" : "L") !== -1 || $q.platform.is.ios === true && $layout.isContainer.value === true
     );
@@ -1022,26 +811,26 @@ var QDrawer = createComponent({
     const headerSlot = computed(() => rightSide.value === true ? $layout.rows.value.top[2] === "r" : $layout.rows.value.top[0] === "l");
     const footerSlot = computed(() => rightSide.value === true ? $layout.rows.value.bottom[2] === "r" : $layout.rows.value.bottom[0] === "l");
     const aboveStyle = computed(() => {
-      const css2 = {};
+      const css = {};
       if ($layout.header.space === true && headerSlot.value === false) {
         if (fixed.value === true) {
-          css2.top = `${$layout.header.offset}px`;
+          css.top = `${$layout.header.offset}px`;
         } else if ($layout.header.space === true) {
-          css2.top = `${$layout.header.size}px`;
+          css.top = `${$layout.header.size}px`;
         }
       }
       if ($layout.footer.space === true && footerSlot.value === false) {
         if (fixed.value === true) {
-          css2.bottom = `${$layout.footer.offset}px`;
+          css.bottom = `${$layout.footer.offset}px`;
         } else if ($layout.footer.space === true) {
-          css2.bottom = `${$layout.footer.size}px`;
+          css.bottom = `${$layout.footer.size}px`;
         }
       }
-      return css2;
+      return css;
     });
     const style = computed(() => {
       const style2 = {
-        width: `${size2.value}px`,
+        width: `${size.value}px`,
         transform: `translateX(${flagContentPosition.value}px)`
       };
       return belowBreakpoint.value === true ? style2 : Object.assign(style2, aboveStyle.value);
@@ -1113,7 +902,7 @@ var QDrawer = createComponent({
         $layout[oldSide].offset = 0;
       }
       $layout.instances[newSide] = instance;
-      $layout[newSide].size = size2.value;
+      $layout[newSide].size = size.value;
       $layout[newSide].space = onLayout.value;
       $layout[newSide].offset = offset.value;
     });
@@ -1143,12 +932,12 @@ var QDrawer = createComponent({
     watch(rightSide, () => {
       applyPosition();
     });
-    watch(size2, (val) => {
+    watch(size, (val) => {
       applyPosition();
       updateSizeOnLayout(props.miniToOverlay, val);
     });
     watch(() => props.miniToOverlay, (val) => {
-      updateSizeOnLayout(val, size2.value);
+      updateSizeOnLayout(val, size.value);
     });
     watch(() => $q.lang.rtl, () => {
       applyPosition();
@@ -1167,11 +956,11 @@ var QDrawer = createComponent({
     function applyPosition(position2) {
       if (position2 === void 0) {
         nextTick(() => {
-          position2 = showing.value === true ? 0 : size2.value;
+          position2 = showing.value === true ? 0 : size.value;
           applyPosition(stateDirection.value * position2);
         });
       } else {
-        if ($layout.isContainer.value === true && rightSide.value === true && (belowBreakpoint.value === true || Math.abs(position2) === size2.value)) {
+        if ($layout.isContainer.value === true && rightSide.value === true && (belowBreakpoint.value === true || Math.abs(position2) === size.value)) {
           position2 += stateDirection.value * $layout.scrollbarWidth.value;
         }
         flagContentPosition.value = position2;
@@ -1202,7 +991,7 @@ var QDrawer = createComponent({
       if (showing.value !== false) {
         return;
       }
-      const width = size2.value, position2 = between(evt.distance.x, 0, width);
+      const width = size.value, position2 = between(evt.distance.x, 0, width);
       if (evt.isFinal === true) {
         const opened = position2 >= Math.min(75, width);
         if (opened === true) {
@@ -1229,7 +1018,7 @@ var QDrawer = createComponent({
       if (showing.value !== true) {
         return;
       }
-      const width = size2.value, dir = evt.direction === props.side, position2 = ($q.lang.rtl === true ? dir !== true : dir) ? between(evt.distance.x, 0, width) : 0;
+      const width = size.value, dir = evt.direction === props.side, position2 = ($q.lang.rtl === true ? dir !== true : dir) ? between(evt.distance.x, 0, width) : 0;
       if (evt.isFinal === true) {
         const opened = Math.abs(position2) < Math.min(75, width);
         if (opened === true) {
@@ -1260,11 +1049,11 @@ var QDrawer = createComponent({
         prop.value = val;
       }
     }
-    function updateSizeOnLayout(miniToOverlay, size3) {
-      updateLayout("size", miniToOverlay === true ? props.miniWidth : size3);
+    function updateSizeOnLayout(miniToOverlay, size2) {
+      updateLayout("size", miniToOverlay === true ? props.miniWidth : size2);
     }
     $layout.instances[props.side] = instance;
-    updateSizeOnLayout(props.miniToOverlay, size2.value);
+    updateSizeOnLayout(props.miniToOverlay, size.value);
     updateLayout("space", onLayout.value);
     updateLayout("offset", offset.value);
     if (props.showIfAbove === true && props.modelValue !== true && showing.value === true && props["onUpdate:modelValue"] !== void 0) {
@@ -1383,20 +1172,20 @@ var QPageContainer = createComponent({
     }
     provide(pageContainerKey, true);
     const style = computed(() => {
-      const css2 = {};
+      const css = {};
       if ($layout.header.space === true) {
-        css2.paddingTop = `${$layout.header.size}px`;
+        css.paddingTop = `${$layout.header.size}px`;
       }
       if ($layout.right.space === true) {
-        css2[`padding${$q.lang.rtl === true ? "Left" : "Right"}`] = `${$layout.right.size}px`;
+        css[`padding${$q.lang.rtl === true ? "Left" : "Right"}`] = `${$layout.right.size}px`;
       }
       if ($layout.footer.space === true) {
-        css2.paddingBottom = `${$layout.footer.size}px`;
+        css.paddingBottom = `${$layout.footer.size}px`;
       }
       if ($layout.left.space === true) {
-        css2[`padding${$q.lang.rtl === true ? "Right" : "Left"}`] = `${$layout.left.size}px`;
+        css[`padding${$q.lang.rtl === true ? "Right" : "Left"}`] = `${$layout.left.size}px`;
       }
-      return css2;
+      return css;
     });
     return () => h("div", {
       class: "q-page-container",
@@ -1524,7 +1313,7 @@ var QResizeObserver = createComponent({
   },
   emits: ["resize"],
   setup(props, { emit }) {
-    let timer = null, targetEl, size2 = { width: -1, height: -1 };
+    let timer = null, targetEl, size = { width: -1, height: -1 };
     function trigger(immediately) {
       if (immediately === true || props.debounce === 0 || props.debounce === "0") {
         emitEvent();
@@ -1539,9 +1328,9 @@ var QResizeObserver = createComponent({
       }
       if (targetEl) {
         const { offsetWidth: width, offsetHeight: height } = targetEl;
-        if (width !== size2.width || height !== size2.height) {
-          size2 = { width, height };
-          emit("resize", size2);
+        if (width !== size.width || height !== size.height) {
+          size = { width, height };
+          emit("resize", size);
         }
       }
     }
@@ -1798,13 +1587,6 @@ var QLayout = createComponent({
     };
   }
 });
-var _export_sfc = (sfc, props) => {
-  const target = sfc.__vccOpts || sfc;
-  for (const [key, val] of props) {
-    target[key] = val;
-  }
-  return target;
-};
 const _sfc_main$1 = {
   name: "EssentialNavigation",
   data() {

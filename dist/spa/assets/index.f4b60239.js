@@ -1174,6 +1174,27 @@ const shallowUnwrapHandlers = {
 function proxyRefs(objectWithRefs) {
   return isReactive(objectWithRefs) ? objectWithRefs : new Proxy(objectWithRefs, shallowUnwrapHandlers);
 }
+class CustomRefImpl {
+  constructor(factory) {
+    this.dep = void 0;
+    this.__v_isRef = true;
+    const { get: get2, set: set2 } = factory(
+      () => trackRefValue(this),
+      () => triggerRefValue(this)
+    );
+    this._get = get2;
+    this._set = set2;
+  }
+  get value() {
+    return this._get();
+  }
+  set value(newVal) {
+    this._set(newVal);
+  }
+}
+function customRef(factory) {
+  return new CustomRefImpl(factory);
+}
 /**
 * @vue/runtime-core v3.4.27
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
@@ -1578,6 +1599,12 @@ function setCurrentRenderingInstance(instance) {
   currentScopeId = instance && instance.type.__scopeId || null;
   return prev;
 }
+function pushScopeId(id) {
+  currentScopeId = id;
+}
+function popScopeId() {
+  currentScopeId = null;
+}
 function withCtx(fn, ctx = currentRenderingInstance, isNonScopedSlot) {
   if (!ctx)
     return fn;
@@ -1845,6 +1872,13 @@ const useSSRContext = () => {
     return ctx;
   }
 };
+function watchSyncEffect(effect, options) {
+  return doWatch(
+    effect,
+    null,
+    { flush: "sync" }
+  );
+}
 const INITIAL_WATCHER_VALUE = {};
 function watch(source, cb, options) {
   return doWatch(source, cb, options);
@@ -2651,6 +2685,13 @@ function normalizePropsOrEmits(props) {
     (normalized, p2) => (normalized[p2] = null, normalized),
     {}
   ) : props;
+}
+function mergeModels(a, b) {
+  if (!a || !b)
+    return a || b;
+  if (isArray$1(a) && isArray$1(b))
+    return a.concat(b);
+  return extend({}, normalizePropsOrEmits(a), normalizePropsOrEmits(b));
 }
 let shouldCacheAccess = true;
 function applyOptions(instance) {
@@ -4902,6 +4943,255 @@ function locateNonHydratedAsyncRoot(instance) {
   }
 }
 const isTeleport = (type) => type.__isTeleport;
+const isTeleportDisabled = (props) => props && (props.disabled || props.disabled === "");
+const isTargetSVG = (target2) => typeof SVGElement !== "undefined" && target2 instanceof SVGElement;
+const isTargetMathML = (target2) => typeof MathMLElement === "function" && target2 instanceof MathMLElement;
+const resolveTarget = (props, select) => {
+  const targetSelector = props && props.to;
+  if (isString(targetSelector)) {
+    if (!select) {
+      return null;
+    } else {
+      const target2 = select(targetSelector);
+      return target2;
+    }
+  } else {
+    return targetSelector;
+  }
+};
+const TeleportImpl = {
+  name: "Teleport",
+  __isTeleport: true,
+  process(n1, n2, container, anchor, parentComponent, parentSuspense, namespace, slotScopeIds, optimized, internals) {
+    const {
+      mc: mountChildren,
+      pc: patchChildren,
+      pbc: patchBlockChildren,
+      o: { insert, querySelector, createText, createComment }
+    } = internals;
+    const disabled = isTeleportDisabled(n2.props);
+    let { shapeFlag, children, dynamicChildren } = n2;
+    if (n1 == null) {
+      const placeholder = n2.el = createText("");
+      const mainAnchor = n2.anchor = createText("");
+      insert(placeholder, container, anchor);
+      insert(mainAnchor, container, anchor);
+      const target2 = n2.target = resolveTarget(n2.props, querySelector);
+      const targetAnchor = n2.targetAnchor = createText("");
+      if (target2) {
+        insert(targetAnchor, target2);
+        if (namespace === "svg" || isTargetSVG(target2)) {
+          namespace = "svg";
+        } else if (namespace === "mathml" || isTargetMathML(target2)) {
+          namespace = "mathml";
+        }
+      }
+      const mount = (container2, anchor2) => {
+        if (shapeFlag & 16) {
+          mountChildren(
+            children,
+            container2,
+            anchor2,
+            parentComponent,
+            parentSuspense,
+            namespace,
+            slotScopeIds,
+            optimized
+          );
+        }
+      };
+      if (disabled) {
+        mount(container, mainAnchor);
+      } else if (target2) {
+        mount(target2, targetAnchor);
+      }
+    } else {
+      n2.el = n1.el;
+      const mainAnchor = n2.anchor = n1.anchor;
+      const target2 = n2.target = n1.target;
+      const targetAnchor = n2.targetAnchor = n1.targetAnchor;
+      const wasDisabled = isTeleportDisabled(n1.props);
+      const currentContainer = wasDisabled ? container : target2;
+      const currentAnchor = wasDisabled ? mainAnchor : targetAnchor;
+      if (namespace === "svg" || isTargetSVG(target2)) {
+        namespace = "svg";
+      } else if (namespace === "mathml" || isTargetMathML(target2)) {
+        namespace = "mathml";
+      }
+      if (dynamicChildren) {
+        patchBlockChildren(
+          n1.dynamicChildren,
+          dynamicChildren,
+          currentContainer,
+          parentComponent,
+          parentSuspense,
+          namespace,
+          slotScopeIds
+        );
+        traverseStaticChildren(n1, n2, true);
+      } else if (!optimized) {
+        patchChildren(
+          n1,
+          n2,
+          currentContainer,
+          currentAnchor,
+          parentComponent,
+          parentSuspense,
+          namespace,
+          slotScopeIds,
+          false
+        );
+      }
+      if (disabled) {
+        if (!wasDisabled) {
+          moveTeleport(
+            n2,
+            container,
+            mainAnchor,
+            internals,
+            1
+          );
+        } else {
+          if (n2.props && n1.props && n2.props.to !== n1.props.to) {
+            n2.props.to = n1.props.to;
+          }
+        }
+      } else {
+        if ((n2.props && n2.props.to) !== (n1.props && n1.props.to)) {
+          const nextTarget = n2.target = resolveTarget(
+            n2.props,
+            querySelector
+          );
+          if (nextTarget) {
+            moveTeleport(
+              n2,
+              nextTarget,
+              null,
+              internals,
+              0
+            );
+          }
+        } else if (wasDisabled) {
+          moveTeleport(
+            n2,
+            target2,
+            targetAnchor,
+            internals,
+            1
+          );
+        }
+      }
+    }
+    updateCssVars(n2);
+  },
+  remove(vnode, parentComponent, parentSuspense, optimized, { um: unmount, o: { remove: hostRemove } }, doRemove) {
+    const { shapeFlag, children, anchor, targetAnchor, target: target2, props } = vnode;
+    if (target2) {
+      hostRemove(targetAnchor);
+    }
+    doRemove && hostRemove(anchor);
+    if (shapeFlag & 16) {
+      const shouldRemove = doRemove || !isTeleportDisabled(props);
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        unmount(
+          child,
+          parentComponent,
+          parentSuspense,
+          shouldRemove,
+          !!child.dynamicChildren
+        );
+      }
+    }
+  },
+  move: moveTeleport,
+  hydrate: hydrateTeleport
+};
+function moveTeleport(vnode, container, parentAnchor, { o: { insert }, m: move }, moveType = 2) {
+  if (moveType === 0) {
+    insert(vnode.targetAnchor, container, parentAnchor);
+  }
+  const { el, anchor, shapeFlag, children, props } = vnode;
+  const isReorder = moveType === 2;
+  if (isReorder) {
+    insert(el, container, parentAnchor);
+  }
+  if (!isReorder || isTeleportDisabled(props)) {
+    if (shapeFlag & 16) {
+      for (let i = 0; i < children.length; i++) {
+        move(
+          children[i],
+          container,
+          parentAnchor,
+          2
+        );
+      }
+    }
+  }
+  if (isReorder) {
+    insert(anchor, container, parentAnchor);
+  }
+}
+function hydrateTeleport(node, vnode, parentComponent, parentSuspense, slotScopeIds, optimized, {
+  o: { nextSibling, parentNode, querySelector }
+}, hydrateChildren) {
+  const target2 = vnode.target = resolveTarget(
+    vnode.props,
+    querySelector
+  );
+  if (target2) {
+    const targetNode = target2._lpa || target2.firstChild;
+    if (vnode.shapeFlag & 16) {
+      if (isTeleportDisabled(vnode.props)) {
+        vnode.anchor = hydrateChildren(
+          nextSibling(node),
+          vnode,
+          parentNode(node),
+          parentComponent,
+          parentSuspense,
+          slotScopeIds,
+          optimized
+        );
+        vnode.targetAnchor = targetNode;
+      } else {
+        vnode.anchor = nextSibling(node);
+        let targetAnchor = targetNode;
+        while (targetAnchor) {
+          targetAnchor = nextSibling(targetAnchor);
+          if (targetAnchor && targetAnchor.nodeType === 8 && targetAnchor.data === "teleport anchor") {
+            vnode.targetAnchor = targetAnchor;
+            target2._lpa = vnode.targetAnchor && nextSibling(vnode.targetAnchor);
+            break;
+          }
+        }
+        hydrateChildren(
+          targetNode,
+          vnode,
+          target2,
+          parentComponent,
+          parentSuspense,
+          slotScopeIds,
+          optimized
+        );
+      }
+    }
+    updateCssVars(vnode);
+  }
+  return vnode.anchor && nextSibling(vnode.anchor);
+}
+const Teleport = TeleportImpl;
+function updateCssVars(vnode) {
+  const ctx = vnode.ctx;
+  if (ctx && ctx.ut) {
+    let node = vnode.children[0].el;
+    while (node && node !== vnode.targetAnchor) {
+      if (node.nodeType === 1)
+        node.setAttribute("data-v-owner", ctx.uid);
+      node = node.nextSibling;
+    }
+    ctx.ut();
+  }
+}
 const Fragment = Symbol.for("v-fgt");
 const Text = Symbol.for("v-txt");
 const Comment = Symbol.for("v-cmt");
@@ -5107,6 +5397,9 @@ function cloneVNode(vnode, extraProps, mergeRef = false, cloneTransition = false
 }
 function createTextVNode(text = " ", flag = 0) {
   return createVNode(Text, null, text, flag);
+}
+function createCommentVNode(text = "", asBlock = false) {
+  return asBlock ? (openBlock(), createBlock(Comment, null, text)) : createVNode(Comment, null, text);
 }
 function normalizeVNode(child) {
   if (child == null || typeof child === "boolean") {
@@ -5487,6 +5780,49 @@ const computed = (getterOrOptions, debugOptions) => {
   const c = computed$1(getterOrOptions, debugOptions, isInSSRComponentSetup);
   return c;
 };
+function useModel(props, name, options = EMPTY_OBJ) {
+  const i = getCurrentInstance();
+  const camelizedName = camelize(name);
+  const hyphenatedName = hyphenate(name);
+  const res = customRef((track2, trigger2) => {
+    let localValue;
+    watchSyncEffect(() => {
+      const propValue = props[name];
+      if (hasChanged(localValue, propValue)) {
+        localValue = propValue;
+        trigger2();
+      }
+    });
+    return {
+      get() {
+        track2();
+        return options.get ? options.get(localValue) : localValue;
+      },
+      set(value) {
+        const rawProps = i.vnode.props;
+        if (!(rawProps && (name in rawProps || camelizedName in rawProps || hyphenatedName in rawProps) && (`onUpdate:${name}` in rawProps || `onUpdate:${camelizedName}` in rawProps || `onUpdate:${hyphenatedName}` in rawProps)) && hasChanged(value, localValue)) {
+          localValue = value;
+          trigger2();
+        }
+        i.emit(`update:${name}`, options.set ? options.set(value) : value);
+      }
+    };
+  });
+  const modifierKey = name === "modelValue" ? "modelModifiers" : `${name}Modifiers`;
+  res[Symbol.iterator] = () => {
+    let i2 = 0;
+    return {
+      next() {
+        if (i2 < 2) {
+          return { value: i2++ ? props[modifierKey] || {} : res, done: false };
+        } else {
+          return { done: true };
+        }
+      }
+    };
+  };
+  return res;
+}
 function h(type, propsOrChildren, children) {
   const l = arguments.length;
   if (l === 2) {
@@ -9151,32 +9487,32 @@ const childrenCommon = [
     title: "lightpainting",
     icon: "brush",
     path: "/",
-    component: () => __vitePreload(() => import("./IndexPage.80355eca.js"), true ? ["assets/IndexPage.80355eca.js","assets/IndexPage.6f52d8f7.css","assets/QPage.851d6b58.js","assets/use-dark.e3a0149a.js"] : void 0)
+    component: () => __vitePreload(() => import("./IndexPage.7e10c95b.js"), true ? ["assets/IndexPage.7e10c95b.js","assets/IndexPage.f580546f.css","assets/QPage.3d06d7db.js","assets/scroll.fee10664.js"] : void 0)
   },
   {
     title: "About",
     icon: "info",
     path: "about",
-    component: () => __vitePreload(() => import("./AboutPage.5fbd652c.js"), true ? ["assets/AboutPage.5fbd652c.js","assets/QPage.851d6b58.js"] : void 0)
+    component: () => __vitePreload(() => import("./AboutPage.40ea24c7.js"), true ? ["assets/AboutPage.40ea24c7.js","assets/QPage.3d06d7db.js"] : void 0)
   },
   {
     title: "Settings",
     icon: "settings",
     path: "settings",
-    component: () => __vitePreload(() => import("./SettingsPage.99e892fb.js"), true ? ["assets/SettingsPage.99e892fb.js","assets/QPage.851d6b58.js"] : void 0)
+    component: () => __vitePreload(() => import("./SettingsPage.64cc9149.js"), true ? ["assets/SettingsPage.64cc9149.js","assets/QPage.3d06d7db.js"] : void 0)
   }
 ];
 const routes = [
   {
     path: "/",
-    component: () => __vitePreload(() => import("./MainLayout.809eb180.js"), true ? ["assets/MainLayout.809eb180.js","assets/use-dark.e3a0149a.js"] : void 0),
+    component: () => __vitePreload(() => import("./MainLayout.b2550b2c.js"), true ? ["assets/MainLayout.b2550b2c.js","assets/scroll.fee10664.js"] : void 0),
     children: [
       ...childrenCommon
     ]
   },
   {
     path: "/:catchAll(.*)*",
-    component: () => __vitePreload(() => import("./ErrorNotFound.22c2b943.js"), true ? [] : void 0)
+    component: () => __vitePreload(() => import("./ErrorNotFound.49ba2518.js"), true ? [] : void 0)
   }
 ];
 var createRouter = route(function() {
@@ -9272,6 +9608,12 @@ function createGlobalNode(id, portalType) {
   nodesList.push(el);
   portalTypeList.push(portalType);
   return el;
+}
+function removeGlobalNode(el) {
+  const nodeIndex = nodesList.indexOf(el);
+  nodesList.splice(nodeIndex, 1);
+  portalTypeList.splice(nodeIndex, 1);
+  el.remove();
 }
 function changeGlobalNodesTarget(newTarget) {
   if (newTarget === target) {
@@ -11004,11 +11346,11 @@ createQuasarApp(createApp, quasarUserOptions).then((app2) => {
     (bootFiles) => bootFiles.map((entry) => entry.default)
   ];
   return Promise[method]([
-    __vitePreload(() => import("./i18n.5aeb119f.js"), true ? [] : void 0),
-    __vitePreload(() => import("./addressbar-color.aab86c52.js"), true ? [] : void 0)
+    __vitePreload(() => import("./i18n.8589b0f7.js"), true ? [] : void 0),
+    __vitePreload(() => import("./addressbar-color.f27e488d.js"), true ? [] : void 0)
   ]).then((bootFiles) => {
     const boot2 = mapFn(bootFiles).filter((entry) => typeof entry === "function");
     start(app2, boot2);
   });
 });
-export { onDeactivated as $, AddressbarColor as A, createBaseVNode as B, withCtx as C, QBtn as D, createBlock as E, Fragment as F, emptyRenderFn as G, layoutKey as H, pageContainerKey as I, toDisplayString as J, unref as K, createTextVNode as L, useRouterLinkProps as M, useRouterLink as N, isKeyCode as O, hUniqueSlot as P, QIcon as Q, onBeforeUnmount as R, History as S, Text as T, vmHasRouter as U, nextTick as V, css as W, getElement as X, client as Y, listenOpts as Z, getEventPath as _, onUnmounted as a, vmIsDestroyed as a0, Platform as a1, createDirective as a2, noop$1 as a3, leftClick as a4, addEvt as a5, preventDraggable as a6, prevent as a7, stop as a8, position as a9, cleanEvt as aa, withDirectives as ab, hDir as ac, provide as ad, isRuntimeSsrPreHydration as ae, reactive as af, childrenCommon as ag, renderList as ah, resolveComponent as ai, isRef as b, computed as c, defineComponent as d, effectScope as e, createVNode as f, getCurrentInstance as g, h, inject as i, boot as j, hMergeSlot as k, hSlot as l, useSizeProps as m, stopAndPrevent as n, onMounted as o, createComponent as p, quasarKey as q, ref as r, shallowRef as s, toRaw as t, useSize as u, useSpinnerProps as v, watch as w, useSpinner as x, openBlock as y, createElementBlock as z };
+export { useSpinner as $, AddressbarColor as A, hSlot as B, useSizeProps as C, toRaw as D, stopAndPrevent as E, Fragment as F, createComponent as G, QIcon as H, isKeyCode as I, prevent as J, nextTick as K, addEvt as L, onBeforeUnmount as M, cleanEvt as N, listenOpts as O, Plugin$4 as P, QBtn as Q, injectProp as R, Teleport as S, Text as T, createGlobalNode as U, removeGlobalNode as V, onDeactivated as W, vmIsDestroyed as X, client as Y, Transition as Z, useSpinnerProps as _, onUnmounted as a, mergeModels as a0, useModel as a1, withCtx as a2, createTextVNode as a3, pushScopeId as a4, popScopeId as a5, createBlock as a6, emptyRenderFn as a7, layoutKey as a8, pageContainerKey as a9, Platform as aa, vmHasRouter as ab, css as ac, getElement as ad, useRouterLinkProps as ae, useRouterLink as af, hUniqueSlot as ag, History as ah, getEventPath as ai, createDirective as aj, noop$1 as ak, leftClick as al, preventDraggable as am, stop as an, position as ao, withDirectives as ap, hDir as aq, provide as ar, isRuntimeSsrPreHydration as as, reactive as at, childrenCommon as au, resolveComponent as av, isRef as b, computed as c, defineComponent as d, effectScope as e, createVNode as f, getCurrentInstance as g, h, inject as i, boot as j, isDate as k, defaultLang as l, openBlock as m, createElementBlock as n, onMounted as o, renderList as p, quasarKey as q, ref as r, shallowRef as s, createCommentVNode as t, createBaseVNode as u, toDisplayString as v, watch as w, unref as x, useSize as y, hMergeSlot as z };
