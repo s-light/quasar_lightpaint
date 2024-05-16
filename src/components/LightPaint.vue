@@ -38,24 +38,16 @@
             </q-btn>
             <!--  -->
         </section>
-        <section>
-            Saved images:
-            <ul>
-                <li v-for="item in saved_visuals" :key="item.filename">
-                    <img v-if="item.type == 'image'" :src="item.data" alt="" />
-                    <video v-else-if="item.type == 'video'" :src="item.data" alt="" />
-                </li>
-            </ul>
-        </section>
+        <SavedVisuals :visuals="saved_visuals">Saved images:</SavedVisuals>
     </div>
 </template>
 
-<style>
+<style scoped>
 video,
 canvas,
 img {
     margin: 1rem;
-    border: solid 1px hsl(260, 100%, 50%);
+    border: solid 1px hsl(250, 100%, 50%);
 }
 
 .flex-container {
@@ -78,7 +70,7 @@ img {
     order: 0;
     flex: 0 1 auto;
     align-self: auto;
-    margin: 0;
+    margin: 0.25rem 0;
 }
 
 /* .flex-container > video,
@@ -102,7 +94,6 @@ img {
 }
 
 .controls {
-    padding-top: 1rem;
     justify-content: space-around;
     max-width: 50rem;
 }
@@ -113,7 +104,10 @@ img {
 
 <script setup>
 import { ref, onMounted, watch } from "vue";
+import { date } from "quasar";
 import "rvfc-polyfill";
+
+import SavedVisuals from "components/SavedVisuals.vue";
 
 const el = ref();
 const animation_handle = ref(null);
@@ -132,8 +126,8 @@ function test(event) {
 }
 
 const video_constraints = {
-    width: { min: 500, ideal: 4000 },
-    height: { min: 500, ideal: 4000 },
+    width: { min: 500, ideal: 1920 },
+    height: { min: 500, ideal: 1080 },
     frameRate: { max: 30 },
     facingMode: { ideal: "environment" },
 };
@@ -142,13 +136,20 @@ const video_constraints = {
 //     video_constraints.facingMode = { ideal: "environment" };
 // }
 
-const dateformat = new Intl.DateTimeFormat(undefined, {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-});
-
-const filename_template = "";
+function generate_filename(title = "lightpainting", ext = "png") {
+    // const dateformat = new Intl.DateTimeFormat(undefined, {
+    //     year: "numeric",
+    //     month: "2-digit",
+    //     day: "2-digit",
+    // });
+    // const date_str = `${dateformat.format()}`;
+    // if (title) {
+    //     title += `- ${title}`;
+    // }
+    const formattedString = date.formatDate(Date.now(), "YYYY-MM-DD - HH:mm:ss.SSS");
+    const filename = `${formattedString} - ${title}.${ext}`;
+    return filename;
+}
 
 onMounted(() => {
     console.log("onMounted");
@@ -179,7 +180,7 @@ function save_canvas() {
     console.log("save_canvas");
     const visual = {
         type: "image",
-        filename: "",
+        filename: generate_filename(),
         data: canvas.value.toDataURL(),
     };
     saved_visuals.value.push(visual);
