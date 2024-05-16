@@ -7,7 +7,7 @@
             -->
             <q-btn padding="xs" round icon="delete_forever" @click="item_delete(item)"></q-btn>
             <q-btn padding="xs" round icon="save" @click="item_save(item)"></q-btn>
-            <img v-if="item.type == 'image'" :src="item.data" alt="" />
+            <img v-if="item.type == 'image'" :src="item.data" alt="" @click="item_copy(item)" />
             <video v-else-if="item.type == 'video'" :src="item.data" alt="" />
             <div class="info">{{ item.filename }}</div>
         </li>
@@ -78,6 +78,10 @@ ul li .info {
 </style>
 
 <script setup>
+import { useQuasar } from "quasar";
+import { saveAs } from "file-saver";
+const $q = useQuasar();
+
 const props = defineProps({
     visuals: {
         type: Array,
@@ -100,5 +104,18 @@ function item_delete(item2remove) {
 
 function item_save(item) {
     console.log("save item", item);
+    saveAs(item.data, item.filename);
+}
+
+async function item_copy(item) {
+    try {
+        // Create ClipboardItem with blob and its type, and add to an array
+        const data = [new ClipboardItem({ [item.blob.type]: item.blob })];
+        // Write the data to the clipboard
+        await navigator.clipboard.write(data);
+        $q.notify(`image '${item.filename}' copied to clipboard.`);
+    } catch (e) {
+        console.log("item_copy failed:", e);
+    }
 }
 </script>

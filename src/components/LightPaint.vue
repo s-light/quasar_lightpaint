@@ -4,48 +4,19 @@
             <video></video>
             <canvas></canvas>
         </section>
-        <section class="controls flex-container">
-            <q-toggle size="5vh" v-model="video_active" icon="videocam" />
-            <q-toggle size="5vh" v-model="paint_active" color="pink" icon="emergency_recording" />
-            <q-btn
-                size="3vh"
-                padding="xs"
-                color="negative"
-                round
-                icon="radio_button_checked"
-                :loading="paint_active"
-                @mousedown="paint_active = true"
-                @mouseup="paint_active = false"
-                @touchstart="paint_active = true"
-                @touchend="paint_active = false"
-            >
-                <template v-slot:loading>
-                    <q-spinner-rings />
-                </template>
-            </q-btn>
-            <!--
-                @mouseleave="paint_active = false" -->
-            <q-btn
-                size="3vh"
-                padding="xs"
-                color="primary"
-                round
-                icon="delete_forever"
-                @click="clear_canvas"
-            >
-            </q-btn>
-            <q-btn size="3vh" padding="xs" color="primary" round icon="save" @click="save_canvas">
-            </q-btn>
-            <!--  -->
-        </section>
+        <LightpainterControls
+            @clear="clear_canvas"
+            @save="save_canvas"
+            v-model:paint_active="paint_active"
+            v-model:video_active="video_active"
+        ></LightpainterControls>
         <SavedVisuals :visuals="saved_visuals">Saved images:</SavedVisuals>
     </div>
 </template>
 
 <style scoped>
 video,
-canvas,
-img {
+canvas {
     margin: 1rem;
     border: solid 1px hsl(250, 100%, 50%);
 }
@@ -92,22 +63,17 @@ img {
         max-height: 45vh;
     }
 }
-
-.controls {
-    justify-content: space-around;
-    max-width: 50rem;
-}
-.controls > * {
-    margin: 0 1rem;
-}
 </style>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
-import { date } from "quasar";
+import { ref, onMounted, onUnmounted, watch } from "vue";
+import { date, useQuasar } from "quasar";
 import "rvfc-polyfill";
 
+const $q = useQuasar();
+
 import SavedVisuals from "components/SavedVisuals.vue";
+import LightpainterControls from "components/LightpainterControls.vue";
 
 const el = ref();
 const animation_handle = ref(null);
@@ -137,15 +103,6 @@ const video_constraints = {
 // }
 
 function generate_filename(title = "lightpainting", ext = "png") {
-    // const dateformat = new Intl.DateTimeFormat(undefined, {
-    //     year: "numeric",
-    //     month: "2-digit",
-    //     day: "2-digit",
-    // });
-    // const date_str = `${dateformat.format()}`;
-    // if (title) {
-    //     title += `- ${title}`;
-    // }
     const formattedString = date.formatDate(Date.now(), "YYYY-MM-DD - HH:mm:ss.SSS");
     const filename = `${formattedString} - ${title}.${ext}`;
     return filename;
@@ -157,7 +114,44 @@ onMounted(() => {
     setup_canvas();
     setup_cam();
     start_cam();
+    try {
+        console.log("add global event listener");
+        document.addEventListener("keydown", handleGlobalKeydown);
+    } catch (error) {
+        console.log(error);
+    }
 });
+onUnmounted(() => {
+    console.log("onUnmounted");
+    try {
+        console.log("remove global event listener");
+        document.removeEventListener("keydown", handleGlobalKeydown);
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+function handleGlobalKeydown(event) {
+    console.log("global keydown", event);
+
+    $q.notify(`key: '${event.key}'`);
+    switch (event.key) {
+        case "p":
+        case " ":
+        case "r":
+            paint_active.value = !paint_active.value;
+            break;
+        case "s":
+            save_canvas();
+            break;
+        case "c":
+            clear_canvas();
+            break;
+
+        default:
+            break;
+    }
+}
 
 function setup_canvas() {
     console.log("setup_canvas");
@@ -178,12 +172,15 @@ function clear_canvas() {
 
 function save_canvas() {
     console.log("save_canvas");
-    const visual = {
-        type: "image",
-        filename: generate_filename(),
-        data: canvas.value.toDataURL(),
-    };
-    saved_visuals.value.push(visual);
+    canvas.value.toBlob((blob) => {
+        const visual = {
+            type: "image",
+            filename: generate_filename(),
+            data: canvas.value.toDataURL(),
+            blob: blob,
+        };
+        saved_visuals.value.push(visual);
+    });
 }
 
 function setup_cam() {

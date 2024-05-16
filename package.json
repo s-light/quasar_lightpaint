@@ -16,6 +16,7 @@
     },
     "dependencies": {
         "@quasar/extras": "^1.16.4",
+        "file-saver": "^2.0.5",
         "pinia": "^2.0.11",
         "quasar": "^2.16.0",
         "rvfc-polyfill": "^1.0.7",
