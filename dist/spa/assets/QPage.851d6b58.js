@@ -1,4 +1,4 @@
-import { p as createComponent, i as inject, G as emptyRenderFn, H as layoutKey, I as pageContainerKey, c as computed, h, l as hSlot, g as getCurrentInstance } from "./index.29135efd.js";
+import { p as createComponent, i as inject, G as emptyRenderFn, H as layoutKey, I as pageContainerKey, c as computed, h, l as hSlot, g as getCurrentInstance } from "./index.2c8d46fc.js";
 var QPage = createComponent({
   name: "QPage",
   props: {

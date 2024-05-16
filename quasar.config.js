@@ -57,6 +57,7 @@ module.exports = configure(function (/* ctx */) {
             // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
 
             // publicPath: '/',
+            publicPath: "/quasar_lightpaint/dist/spa/",
             // analyze: true,
             env: {
                 //https://forum.quasar-framework.org/topic/6853/auto-generate-a-build-number-in-spa/15?_=1653270667151

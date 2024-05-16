@@ -1,6 +1,6 @@
-import { Q as QPage } from "./QPage.e30fc9ad.js";
-import { i as inject, q as quasarKey, r as ref, c as computed, h, u as useSize, k as hMergeSlot, l as hSlot, m as useSizeProps, g as getCurrentInstance, t as toRaw, n as stopAndPrevent, p as createComponent, Q as QIcon, v as useSpinnerProps, x as useSpinner, o as onMounted, w as watch, y as openBlock, z as createElementBlock, B as createBaseVNode, f as createVNode, C as withCtx, D as QBtn, E as createBlock } from "./index.29135efd.js";
-import { u as useDark, a as useDarkProps } from "./use-dark.1f461def.js";
+import { Q as QPage } from "./QPage.851d6b58.js";
+import { i as inject, q as quasarKey, r as ref, c as computed, h, u as useSize, k as hMergeSlot, l as hSlot, m as useSizeProps, g as getCurrentInstance, t as toRaw, n as stopAndPrevent, p as createComponent, Q as QIcon, v as useSpinnerProps, x as useSpinner, o as onMounted, w as watch, y as openBlock, z as createElementBlock, B as createBaseVNode, f as createVNode, C as withCtx, D as QBtn, E as createBlock } from "./index.2c8d46fc.js";
+import { u as useDark, a as useDarkProps } from "./use-dark.e3a0149a.js";
 function useQuasar() {
   return inject(quasarKey);
 }

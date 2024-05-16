@@ -3,7 +3,7 @@ const scriptRel = function detectScriptRel() {
   return relList && relList.supports && relList.supports("modulepreload") ? "modulepreload" : "preload";
 }();
 const seen = {};
-const base = "/";
+const base = "/quasar_lightpaint/dist/spa/";
 const __vitePreload = function preload(baseModule, deps) {
   if (!deps || deps.length === 0) {
     return baseModule();
@@ -9151,32 +9151,32 @@ const childrenCommon = [
     title: "lightpainting",
     icon: "brush",
     path: "/",
-    component: () => __vitePreload(() => import("./IndexPage.0d0dc6ad.js"), true ? ["assets/IndexPage.0d0dc6ad.js","assets/IndexPage.6f52d8f7.css","assets/QPage.e30fc9ad.js","assets/use-dark.1f461def.js"] : void 0)
+    component: () => __vitePreload(() => import("./IndexPage.80355eca.js"), true ? ["assets/IndexPage.80355eca.js","assets/IndexPage.6f52d8f7.css","assets/QPage.851d6b58.js","assets/use-dark.e3a0149a.js"] : void 0)
   },
   {
     title: "About",
     icon: "info",
     path: "about",
-    component: () => __vitePreload(() => import("./AboutPage.3e939c33.js"), true ? ["assets/AboutPage.3e939c33.js","assets/QPage.e30fc9ad.js"] : void 0)
+    component: () => __vitePreload(() => import("./AboutPage.5fbd652c.js"), true ? ["assets/AboutPage.5fbd652c.js","assets/QPage.851d6b58.js"] : void 0)
   },
   {
     title: "Settings",
     icon: "settings",
     path: "settings",
-    component: () => __vitePreload(() => import("./SettingsPage.9c734f55.js"), true ? ["assets/SettingsPage.9c734f55.js","assets/QPage.e30fc9ad.js"] : void 0)
+    component: () => __vitePreload(() => import("./SettingsPage.99e892fb.js"), true ? ["assets/SettingsPage.99e892fb.js","assets/QPage.851d6b58.js"] : void 0)
   }
 ];
 const routes = [
   {
     path: "/",
-    component: () => __vitePreload(() => import("./MainLayout.94650d89.js"), true ? ["assets/MainLayout.94650d89.js","assets/use-dark.1f461def.js"] : void 0),
+    component: () => __vitePreload(() => import("./MainLayout.809eb180.js"), true ? ["assets/MainLayout.809eb180.js","assets/use-dark.e3a0149a.js"] : void 0),
     children: [
       ...childrenCommon
     ]
   },
   {
     path: "/:catchAll(.*)*",
-    component: () => __vitePreload(() => import("./ErrorNotFound.037e6573.js"), true ? [] : void 0)
+    component: () => __vitePreload(() => import("./ErrorNotFound.22c2b943.js"), true ? [] : void 0)
   }
 ];
 var createRouter = route(function() {
@@ -9184,7 +9184,7 @@ var createRouter = route(function() {
   const Router = createRouter$1({
     scrollBehavior: () => ({ left: 0, top: 0 }),
     routes,
-    history: createHistory("/")
+    history: createHistory("/quasar_lightpaint/dist/spa/")
   });
   return Router;
 });
@@ -10936,7 +10936,7 @@ var Notify = {
   }
 };
 var quasarUserOptions = { config: { "notify": {} }, plugins: { AddressbarColor, AppFullscreen: Plugin$2, LocalStorage: Plugin$1, SessionStorage: Plugin, Notify } };
-const publicPath = `/`;
+const publicPath = `/quasar_lightpaint/dist/spa/`;
 async function start({
   app: app2,
   router,
@@ -11004,8 +11004,8 @@ createQuasarApp(createApp, quasarUserOptions).then((app2) => {
     (bootFiles) => bootFiles.map((entry) => entry.default)
   ];
   return Promise[method]([
-    __vitePreload(() => import("./i18n.6d2b971e.js"), true ? [] : void 0),
-    __vitePreload(() => import("./addressbar-color.81c82dc5.js"), true ? [] : void 0)
+    __vitePreload(() => import("./i18n.5aeb119f.js"), true ? [] : void 0),
+    __vitePreload(() => import("./addressbar-color.aab86c52.js"), true ? [] : void 0)
   ]).then((bootFiles) => {
     const boot2 = mapFn(bootFiles).filter((entry) => typeof entry === "function");
     start(app2, boot2);
