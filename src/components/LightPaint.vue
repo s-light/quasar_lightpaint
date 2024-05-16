@@ -1,12 +1,14 @@
 <template>
-    <div class="flex-container">
-        <video></video>
-        <canvas></canvas>
-        <section>
+    <div ref="el" class="flex-container flex-column">
+        <section class="flex-container">
+            <video></video>
+            <canvas></canvas>
+        </section>
+        <section class="controls flex-container">
             <q-toggle size="5vh" v-model="video_active" icon="videocam" />
             <q-toggle size="5vh" v-model="paint_active" color="pink" icon="emergency_recording" />
             <q-btn
-                size="2vh"
+                size="3vh"
                 padding="xs"
                 color="negative"
                 round
@@ -14,13 +16,17 @@
                 :loading="paint_active"
                 @mousedown="paint_active = true"
                 @mouseup="paint_active = false"
+                @touchstart="paint_active = true"
+                @touchend="paint_active = false"
             >
                 <template v-slot:loading>
                     <q-spinner-rings />
                 </template>
             </q-btn>
+            <!--
+                @mouseleave="paint_active = false" -->
             <q-btn
-                size="2vh"
+                size="3vh"
                 padding="xs"
                 color="primary"
                 round
@@ -28,27 +34,43 @@
                 @click="clear_canvas"
             >
             </q-btn>
-            <q-btn size="2vh" padding="xs" color="primary" round icon="save" @click="save_canvas">
+            <q-btn size="3vh" padding="xs" color="primary" round icon="save" @click="save_canvas">
             </q-btn>
             <!--  -->
+        </section>
+        <section>
+            Saved images:
+            <ul>
+                <li v-for="item in saved_visuals" :key="item.filename">
+                    <img v-if="item.type == 'image'" :src="item.data" alt="" />
+                    <video v-else-if="item.type == 'video'" :src="item.data" alt="" />
+                </li>
+            </ul>
         </section>
     </div>
 </template>
 
 <style>
 video,
-canvas {
+canvas,
+img {
     margin: 1rem;
     border: solid 1px hsl(260, 100%, 50%);
 }
 
 .flex-container {
     display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
+    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: center;
     align-content: stretch;
-    align-items: stretch;
+    align-items: center;
+    /* width: 100%; */
+    /* height: 100%; */
+}
+
+.flex-column {
+    flex-direction: column;
 }
 
 /* .flex-item:nth-child(1) */
@@ -56,17 +78,36 @@ canvas {
     order: 0;
     flex: 0 1 auto;
     align-self: auto;
+    margin: 0;
 }
-.flex-container > video,
+
+/* .flex-container > video,
 .flex-container > canvas {
-    order: 0;
-    flex: 1 1 auto;
-    align-self: auto;
+    flex-grow: 1;
+} */
+
+@media (orientation: landscape) {
+    .flex-container > video,
+    .flex-container > canvas {
+        max-width: 50vw;
+        /* max-height: 90vh; */
+    }
 }
-.flex-container > video,
-.flex-container > canvas {
-    max-width: 99vw;
-    max-height: 45vh;
+@media (orientation: portrait) {
+    .flex-container > video,
+    .flex-container > canvas {
+        /* max-width: 50vw; */
+        max-height: 45vh;
+    }
+}
+
+.controls {
+    padding-top: 1rem;
+    justify-content: space-around;
+    max-width: 50rem;
+}
+.controls > * {
+    margin: 0 1rem;
 }
 </style>
 
@@ -83,17 +124,31 @@ const media_stream = ref();
 const video_track = ref();
 const video_active = ref(true);
 const paint_active = ref(false);
+const saved_visuals = ref([]);
+
+function test(event) {
+    console.log("mouseout", event);
+    // paint_active.value = false;
+}
 
 const video_constraints = {
-    width: { min: 640, ideal: 4000 },
-    height: { min: 1000, ideal: 2000 },
+    width: { min: 500, ideal: 4000 },
+    height: { min: 500, ideal: 4000 },
     frameRate: { max: 30 },
-    // facingMode: { exact: "environment" },
+    facingMode: { ideal: "environment" },
 };
 // if (navigator.mediaDevices.getSupportedConstraints().facingMode) {
 //     console.log("set facingMode environment.");
-//     video_constraints.facingMode = { exact: "environment" };
+//     video_constraints.facingMode = { ideal: "environment" };
 // }
+
+const dateformat = new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+});
+
+const filename_template = "";
 
 onMounted(() => {
     console.log("onMounted");
@@ -114,19 +169,20 @@ function setup_canvas() {
 function clear_canvas() {
     console.log("clear_canvas");
     const compOp = ctx.value.globalCompositeOperation;
-    console.log("globalCompositeOperation", ctx.value.globalCompositeOperation);
     ctx.value.globalCompositeOperation = "source-over";
-    console.log("globalCompositeOperation", ctx.value.globalCompositeOperation);
     ctx.value.fillStyle = "#000";
     ctx.value.fillRect(0, 0, canvas.value.width, canvas.value.height);
     ctx.value.globalCompositeOperation = compOp;
-    console.log("globalCompositeOperation", ctx.value.globalCompositeOperation);
-    console.log("clear_canvas done.");
 }
 
 function save_canvas() {
     console.log("save_canvas");
-    console.log("TODO: please implement save!");
+    const visual = {
+        type: "image",
+        filename: "",
+        data: canvas.value.toDataURL(),
+    };
+    saved_visuals.value.push(visual);
 }
 
 function setup_cam() {
@@ -164,11 +220,13 @@ function start_cam() {
 }
 
 function stop_cam() {
-    media_stream.value.getTracks().forEach((track) => {
-        if (track.readyState == "live") {
-            track.stop();
-        }
-    });
+    if (media_stream.value) {
+        media_stream.value.getTracks().forEach((track) => {
+            if (track.readyState == "live") {
+                track.stop();
+            }
+        });
+    }
     video.value.srcObject = null;
 }
 
