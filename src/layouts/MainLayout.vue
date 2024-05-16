@@ -22,7 +22,7 @@
         >
         </q-btn>
 
-        <q-drawer v-model="leftDrawerOpen" show-if-above bordered elevated persistent>
+        <q-drawer v-model="leftDrawerOpen" bordered elevated persistent>
             <q-list class="q-pt-xl q-pb-xl">
                 <EssentialNavigation />
 
