@@ -1,6 +1,6 @@
 {
     "name": "quasar-lightpaint",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "description": "a simple light painting app for webcam & phone use",
     "productName": "Quasar LightPaint",
     "projectUrl": "https://github.com/s-light/quasar_lightpaint",
