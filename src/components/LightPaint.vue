@@ -1,8 +1,14 @@
 <template>
-    <div ref="el" class="flex-container flex-column">
+    <div
+        ref="el"
+        class="flex-container flex-column"
+        :class="{ 'video-portrait': video_is_portrait }"
+    >
         <section class="flex-container">
-            <video></video>
-            <canvas id="tweak"></canvas>
+            <div class="flex-container flex-column">
+                <video></video>
+                <canvas id="tweak"></canvas>
+            </div>
             <canvas id="result"></canvas>
         </section>
         <LightpainterControls
@@ -53,23 +59,21 @@ canvas {
     flex-grow: 1;
 } */
 
-@media (orientation: landscape) {
-    .flex-container > video,
-    .flex-container > canvas#tweak {
-        max-width: 25vw;
-        /* max-height: 90vh; */
-    }
-    .flex-container > canvas#result {
-        max-width: 50vw;
-        /* max-height: 90vh; */
-    }
+.flex-container > video,
+.flex-container > canvas#tweak {
+    max-width: 32vw;
+    max-height: 40vh;
 }
-@media (orientation: portrait) {
-    .flex-container > video,
-    .flex-container > canvas {
-        /* max-width: 50vw; */
-        max-height: 45vh;
-    }
+.flex-container > canvas#result {
+    max-width: 67vw;
+    max-height: 80vh;
+}
+
+.video-portrait .flex-container > video,
+.video-portrait .flex-container > canvas#tweak,
+.video-portrait .flex-container > canvas#result {
+    transform: rotate(0deg);
+    /* transform: rotate(90deg); */
 }
 </style>
 
@@ -91,6 +95,7 @@ const video = ref();
 const media_stream = ref();
 const video_track = ref();
 const video_active = ref(true);
+const video_is_portrait = ref(false);
 
 const canvas_result = ref();
 const ctx_result = ref();
@@ -272,6 +277,8 @@ function video_load_callback() {
     canvas_result.value.width = track_settings.width;
     ctx_result.value.globalCompositeOperation = "lighten";
 
+    video_is_portrait.value = track_settings.height > track_settings.width;
+    console.log("video_is_portrait", video_is_portrait.value);
     clear_canvas();
 
     // console.log("globalCompositeOperation", ctx_result.value.globalCompositeOperation);
@@ -281,6 +288,7 @@ function video_load_callback() {
 }
 function step() {
     if (tweak_active.value) {
+        // ctx_tweak.value.rotate((90 * Math.PI) / 180);
         ctx_tweak.value.drawImage(
             video.value,
             0,
@@ -307,13 +315,20 @@ function easeInExpo(x) {
     return x === 0 ? 0 : Math.pow(2, 10 * x - 10);
 }
 
+// https://cubic-bezier.com/#1,0,1,.02
 function bezier(t, initial, p1, p2, final) {
+    // https://morethandev.hashnode.dev/demystifying-the-cubic-bezier-function-ft-javascript
     return (
         (1 - t) * (1 - t) * (1 - t) * initial +
         3 * (1 - t) * (1 - t) * t * p1 +
         3 * (1 - t) * t * t * p2 +
         t * t * t * final
     );
+}
+
+function bezierSimple(t, p1) {
+    // https://morethandev.hashnode.dev/demystifying-the-cubic-bezier-function-ft-javascript
+    return 3 * (1 - t) * (1 - t) * t * p1 + t * t * t;
 }
 
 function tweakContrast() {
@@ -342,9 +357,9 @@ function tweakContrast() {
 
         // bezier
         // tweak_lum.value
-        data[i + 0] = r * bezier(lum, 0, tweak_lum.value, 0, 1) * 255;
-        data[i + 1] = g * bezier(lum, 0, tweak_lum.value, 0, 1) * 255;
-        data[i + 2] = b * bezier(lum, 0, tweak_lum.value, 0, 1) * 255;
+        data[i + 1] = g * bezierSimple(lum, tweak_lum.value) * 255;
+        data[i + 0] = r * bezierSimple(lum, tweak_lum.value) * 255;
+        data[i + 2] = b * bezierSimple(lum, tweak_lum.value) * 255;
 
         // if (lum < tweak_lum.value) {
         //     data[i + 0] = 0;
