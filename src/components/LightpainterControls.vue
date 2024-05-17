@@ -1,7 +1,8 @@
 <template>
     <div class="controls">
-        <q-toggle size="5vh" v-model="video_active" icon="videocam" />
-        <q-toggle size="5vh" v-model="paint_active" color="pink" icon="emergency_recording">
+        <q-toggle size="5vh" dense v-model="video_active" icon="videocam" />
+        <q-toggle size="5vh" dense v-model="tweak_active" icon="tonality" />
+        <q-toggle size="5vh" dense v-model="paint_active" color="pink" icon="emergency_recording">
             <q-tooltip> 'r' to toggle painting</q-tooltip>
         </q-toggle>
         <q-btn
@@ -35,6 +36,7 @@
         <q-btn size="3vh" padding="xs" color="primary" round icon="save" @click="$emit('save')">
             <q-tooltip>'s' to save current painting to memory</q-tooltip>
         </q-btn>
+        <q-slider v-model="tweak_lum" :min="-5.0" :max="2.0" :step="0" />
         <!--  -->
     </div>
 </template>
@@ -68,7 +70,9 @@ const $q = useQuasar();
 // });
 
 const video_active = defineModel("video_active", { type: Boolean, required: true });
+const tweak_active = defineModel("tweak_active", { type: Boolean, required: true });
 const paint_active = defineModel("paint_active", { type: Boolean, required: true });
+const tweak_lum = defineModel("tweak_lum", { type: Number, required: true });
 
 const emit = defineEmits(["clear", "save"]);
 </script>

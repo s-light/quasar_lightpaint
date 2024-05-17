@@ -2,14 +2,18 @@
     <div ref="el" class="flex-container flex-column">
         <section class="flex-container">
             <video></video>
-            <canvas></canvas>
+            <canvas id="tweak"></canvas>
+            <canvas id="result"></canvas>
         </section>
         <LightpainterControls
             @clear="clear_canvas"
             @save="save_canvas"
             v-model:paint_active="paint_active"
+            v-model:tweak_active="tweak_active"
+            v-model:tweak_lum="tweak_lum"
             v-model:video_active="video_active"
         ></LightpainterControls>
+        <!-- v-model:video_filter_active="video_filter_active" -->
         <SavedVisuals :visuals="saved_visuals">Saved images:</SavedVisuals>
     </div>
 </template>
@@ -51,7 +55,11 @@ canvas {
 
 @media (orientation: landscape) {
     .flex-container > video,
-    .flex-container > canvas {
+    .flex-container > canvas#tweak {
+        max-width: 25vw;
+        /* max-height: 90vh; */
+    }
+    .flex-container > canvas#result {
         max-width: 50vw;
         /* max-height: 90vh; */
     }
@@ -66,7 +74,7 @@ canvas {
 </style>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from "vue";
+import { ref, onMounted, onUnmounted, watch, reactive } from "vue";
 import { date, useQuasar } from "quasar";
 import "rvfc-polyfill";
 
@@ -74,15 +82,24 @@ const $q = useQuasar();
 
 import SavedVisuals from "components/SavedVisuals.vue";
 import LightpainterControls from "components/LightpainterControls.vue";
+import { watchEffect } from "vue";
 
 const el = ref();
 const animation_handle = ref(null);
-const canvas = ref();
-const ctx = ref();
+
 const video = ref();
 const media_stream = ref();
 const video_track = ref();
 const video_active = ref(true);
+
+const canvas_result = ref();
+const ctx_result = ref();
+
+const canvas_tweak = ref();
+const ctx_tweak = ref();
+const tweak_active = ref(true);
+const tweak_lum = ref(0.8);
+
 const paint_active = ref(false);
 const saved_visuals = ref([]);
 
@@ -92,8 +109,10 @@ function test(event) {
 }
 
 const video_constraints = {
-    width: { min: 500, ideal: 1920 },
-    height: { min: 500, ideal: 1080 },
+    width: { min: 800, ideal: 1920 },
+    height: { min: 600, ideal: 1080 },
+    // width: { min: 500, ideal: 500 },
+    // height: { min: 800, ideal: 1920 },
     frameRate: { max: 30 },
     facingMode: { ideal: "environment" },
 };
@@ -155,28 +174,39 @@ function handleGlobalKeydown(event) {
 
 function setup_canvas() {
     console.log("setup_canvas");
-    canvas.value = document.querySelector("canvas");
-    ctx.value = canvas.value.getContext("2d");
-    console.log("canvas", canvas.value);
-    console.log("ctx", ctx.value);
+
+    canvas_tweak.value = document.querySelector("canvas");
+    ctx_tweak.value = canvas_tweak.value.getContext("2d");
+
+    canvas_result.value = document.querySelector("canvas#result");
+    ctx_result.value = canvas_result.value.getContext("2d");
+
+    // console.log("canvas_result", canvas_result.value);
+    // console.log("ctx_result", ctx_result.value);
+    // console.log("canvas_tweak", canvas_tweak.value);
+    // console.log("ctx_tweak", ctx_tweak.value);
 }
 
 function clear_canvas() {
     console.log("clear_canvas");
-    const compOp = ctx.value.globalCompositeOperation;
-    ctx.value.globalCompositeOperation = "source-over";
-    ctx.value.fillStyle = "#000";
-    ctx.value.fillRect(0, 0, canvas.value.width, canvas.value.height);
-    ctx.value.globalCompositeOperation = compOp;
+
+    ctx_tweak.value.fillStyle = "#000";
+    ctx_tweak.value.fillRect(0, 0, canvas_tweak.value.width, canvas_tweak.value.height);
+
+    const compOp = ctx_result.value.globalCompositeOperation;
+    ctx_result.value.globalCompositeOperation = "source-over";
+    ctx_result.value.fillStyle = "#000";
+    ctx_result.value.fillRect(0, 0, canvas_result.value.width, canvas_result.value.height);
+    ctx_result.value.globalCompositeOperation = compOp;
 }
 
 function save_canvas() {
     console.log("save_canvas");
-    canvas.value.toBlob((blob) => {
+    canvas_result.value.toBlob((blob) => {
         const visual = {
             type: "image",
             filename: generate_filename(),
-            data: canvas.value.toDataURL(),
+            data: canvas_result.value.toDataURL(),
             blob: blob,
         };
         saved_visuals.value.push(visual);
@@ -214,6 +244,7 @@ function start_cam() {
         })
         .catch(function (err) {
             console.log("An error occurred: " + err);
+            $q.notify("Starting Camera:" + err);
         });
 }
 
@@ -232,17 +263,102 @@ function video_load_callback() {
     console.log("video_load_callback");
     video.value.cancelVideoFrameCallback(animation_handle.value);
     const track_settings = video_track.value.getSettings();
-    canvas.value.height = track_settings.height;
-    canvas.value.width = track_settings.width;
-    ctx.value.globalCompositeOperation = "lighten";
-    console.log("globalCompositeOperation", ctx.value.globalCompositeOperation);
+
+    // set canvas sizes
+    canvas_tweak.value.height = track_settings.height;
+    canvas_tweak.value.width = track_settings.width;
+
+    canvas_result.value.height = track_settings.height;
+    canvas_result.value.width = track_settings.width;
+    ctx_result.value.globalCompositeOperation = "lighten";
+
+    clear_canvas();
+
+    // console.log("globalCompositeOperation", ctx_result.value.globalCompositeOperation);
+
+    // start processing
     step();
 }
 function step() {
-    if (paint_active.value) {
+    if (tweak_active.value) {
+        ctx_tweak.value.drawImage(
+            video.value,
+            0,
+            0,
+            canvas_tweak.value.width,
+            canvas_tweak.value.height
+        );
+        tweakContrast();
+    } else if (paint_active.value) {
         // update the canvas when a video proceeds to next frame
-        ctx.value.drawImage(video.value, 0, 0, canvas.value.width, canvas.value.height);
+        ctx_result.value.drawImage(
+            video.value,
+            0,
+            0,
+            canvas_result.value.width,
+            canvas_result.value.height
+        );
     }
     animation_handle.value = video.value.requestVideoFrameCallback(step);
+}
+
+function easeInExpo(x) {
+    // https://easings.net/#easeInExpo
+    return x === 0 ? 0 : Math.pow(2, 10 * x - 10);
+}
+
+function bezier(t, initial, p1, p2, final) {
+    return (
+        (1 - t) * (1 - t) * (1 - t) * initial +
+        3 * (1 - t) * (1 - t) * t * p1 +
+        3 * (1 - t) * t * t * p2 +
+        t * t * t * final
+    );
+}
+
+function tweakContrast() {
+    const imageData = ctx_tweak.value.getImageData(
+        0,
+        0,
+        canvas_tweak.value.width,
+        canvas_tweak.value.height
+    );
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        let r = data[i + 0];
+        let g = data[i + 1];
+        let b = data[i + 2];
+        // see https://en.wikipedia.org/wiki/HSL_and_HSV#Formal_derivation
+        // convert r,g,b [0,255] range to [0,1]
+        r = r / 255;
+        g = g / 255;
+        b = b / 255;
+        // get the min and max of r,g,b
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        // lightness is the average of the largest and smallest color components
+        const lum = (max + min) / 2;
+
+        // bezier
+        // tweak_lum.value
+        data[i + 0] = r * bezier(lum, 0, tweak_lum.value, 0, 1) * 255;
+        data[i + 1] = g * bezier(lum, 0, tweak_lum.value, 0, 1) * 255;
+        data[i + 2] = b * bezier(lum, 0, tweak_lum.value, 0, 1) * 255;
+
+        // if (lum < tweak_lum.value) {
+        //     data[i + 0] = 0;
+        //     data[i + 1] = 0;
+        //     data[i + 2] = 0;
+        //     // data[i + 3] = 0;
+        // } else {
+        //     // data[i + 3] = easeInExpo(lum) * 255;
+        //     // data[i + 3] = 255;
+        // }
+    }
+    ctx_tweak.value.putImageData(imageData, 0, 0);
+    if (paint_active.value) {
+        ctx_result.value.drawImage(canvas_tweak.value, 0, 0);
+    }
 }
 </script>
