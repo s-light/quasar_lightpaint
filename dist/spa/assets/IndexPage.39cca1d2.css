@@ -1,5 +1,5 @@
 
-ul[data-v-46060954] {
+ul[data-v-b693a684] {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -11,7 +11,7 @@ ul[data-v-46060954] {
     margin: 1rem;
     padding: 0;
 }
-ul li[data-v-46060954] {
+ul li[data-v-b693a684] {
     order: 0;
     flex: 0 1 auto;
     align-self: auto;
@@ -21,27 +21,27 @@ ul li[data-v-46060954] {
 
     border: solid 1px hsl(250, 100%, 50%);
 }
-ul li button.q-btn[data-v-46060954] {
+ul li button.q-btn[data-v-b693a684] {
     position: absolute;
     top: 0.5rem;
 }
-ul li button.q-btn[data-v-46060954]:nth-child(1) {
+ul li button.q-btn[data-v-b693a684]:nth-child(1) {
     right: 0.5rem;
 }
-ul li button.q-btn[data-v-46060954]:nth-child(2) {
+ul li button.q-btn[data-v-b693a684]:nth-child(2) {
     right: auto;
     left: 0.5rem;
 }
-ul li video[data-v-46060954],
-ul li img[data-v-46060954] {
+ul li video[data-v-b693a684],
+ul li img[data-v-b693a684] {
     display: block;
     margin: 0;
     padding: 0;
     max-height: 40vh;
     /* allow 5 in a row */
-    max-width: calc(20vw - 1.1rem);
+    max-width: calc(25vw - 1.1rem);
 }
-ul li .info[data-v-46060954] {
+ul li .info[data-v-b693a684] {
     position: absolute;
     bottom: 1px;
     left: 1px;
@@ -52,6 +52,7 @@ ul li .info[data-v-46060954] {
     width: calc(100% - (2 * 1px));
     padding: 0.3em;
     background-color: hsla(250, 100%, 50%, 0.6);
+    font-size: 1vh;
 }
 
 .controls[data-v-fb1bc9c6] {
@@ -68,12 +69,12 @@ ul li .info[data-v-46060954] {
     margin: 0 0.8rem;
 }
 
-video[data-v-9c808e64],
-canvas[data-v-9c808e64] {
+video[data-v-55e6ad42],
+canvas[data-v-55e6ad42] {
     margin: 1rem;
     border: solid 1px hsl(250, 100%, 50%);
 }
-.flex-container[data-v-9c808e64] {
+.flex-container[data-v-55e6ad42] {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -83,12 +84,12 @@ canvas[data-v-9c808e64] {
     /* width: 100%; */
     /* height: 100%; */
 }
-.flex-column[data-v-9c808e64] {
+.flex-column[data-v-55e6ad42] {
     flex-direction: column;
 }
 
 /* .flex-item:nth-child(1) */
-.flex-container[data-v-9c808e64] > * {
+.flex-container[data-v-55e6ad42] > * {
     order: 0;
     flex: 0 1 auto;
     align-self: auto;
@@ -99,18 +100,19 @@ canvas[data-v-9c808e64] {
 .flex-container > canvas {
     flex-grow: 1;
 } */
-.flex-container > video[data-v-9c808e64],
-.flex-container > canvas#tweak[data-v-9c808e64] {
+.flex-container > video[data-v-55e6ad42],
+.flex-container > canvas#tweak[data-v-55e6ad42] {
     max-width: 32vw;
     max-height: 40vh;
 }
-.flex-container > canvas#result[data-v-9c808e64] {
+.flex-container > canvas#result[data-v-55e6ad42] {
     max-width: 67vw;
     max-height: 80vh;
 }
-.video-portrait .flex-container > video[data-v-9c808e64],
-.video-portrait .flex-container > canvas#tweak[data-v-9c808e64],
-.video-portrait .flex-container > canvas#result[data-v-9c808e64] {
-    transform: rotate(0deg);
-    /* transform: rotate(90deg); */
+@media screen and (orientation: landscape) {
+.video-portrait .flex-container > video[data-v-55e6ad42] {
+        transform: rotate(-90deg);
+        max-height: 32vw;
+        max-width: 40vh;
+}
 }

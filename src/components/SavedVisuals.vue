@@ -60,7 +60,7 @@ ul li img {
     padding: 0;
     max-height: 40vh;
     /* allow 5 in a row */
-    max-width: calc(20vw - 1.1rem);
+    max-width: calc(25vw - 1.1rem);
 }
 
 ul li .info {
@@ -74,6 +74,7 @@ ul li .info {
     width: calc(100% - (2 * 1px));
     padding: 0.3em;
     background-color: hsla(250, 100%, 50%, 0.6);
+    font-size: 1vh;
 }
 </style>
 

@@ -69,11 +69,12 @@ canvas {
     max-height: 80vh;
 }
 
-.video-portrait .flex-container > video,
-.video-portrait .flex-container > canvas#tweak,
-.video-portrait .flex-container > canvas#result {
-    transform: rotate(0deg);
-    /* transform: rotate(90deg); */
+@media screen and (orientation: landscape) {
+    .video-portrait .flex-container > video {
+        transform: rotate(-90deg);
+        max-height: 32vw;
+        max-width: 40vh;
+    }
 }
 </style>
 
@@ -96,6 +97,7 @@ const media_stream = ref();
 const video_track = ref();
 const video_active = ref(true);
 const video_is_portrait = ref(false);
+const device_is_landscape = ref(true);
 
 const canvas_result = ref();
 const ctx_result = ref();
@@ -225,6 +227,16 @@ function setup_cam() {
     video.value.addEventListener("loadeddata", video_load_callback, false);
 }
 
+screen.addEventListener("orientationchange", () => {
+    console.log(`The orientation of the screen is: ${screen.orientation}`);
+    if (screen.orientation.startWith("landscape")) {
+        device_is_landscape.value = true;
+    } else {
+        // device in landscape mode
+        device_is_landscape.value = false;
+    }
+    video_load_callback();
+});
 watch(video_active, async (newValue, oldValue) => {
     if (newValue) {
         start_cam();
@@ -269,16 +281,25 @@ function video_load_callback() {
     video.value.cancelVideoFrameCallback(animation_handle.value);
     const track_settings = video_track.value.getSettings();
 
-    // set canvas sizes
-    canvas_tweak.value.height = track_settings.height;
-    canvas_tweak.value.width = track_settings.width;
-
-    canvas_result.value.height = track_settings.height;
-    canvas_result.value.width = track_settings.width;
-    ctx_result.value.globalCompositeOperation = "lighten";
-
     video_is_portrait.value = track_settings.height > track_settings.width;
     console.log("video_is_portrait", video_is_portrait.value);
+
+    if (video_is_portrait.value && device_is_landscape.value) {
+        canvas_tweak.value.height = track_settings.width;
+        canvas_tweak.value.width = track_settings.height;
+
+        canvas_result.value.height = track_settings.width;
+        canvas_result.value.width = track_settings.height;
+    } else {
+        // set canvas sizes
+        canvas_tweak.value.height = track_settings.height;
+        canvas_tweak.value.width = track_settings.width;
+
+        canvas_result.value.height = track_settings.height;
+        canvas_result.value.width = track_settings.width;
+    }
+    ctx_result.value.globalCompositeOperation = "lighten";
+
     clear_canvas();
 
     // console.log("globalCompositeOperation", ctx_result.value.globalCompositeOperation);
@@ -287,25 +308,35 @@ function video_load_callback() {
     step();
 }
 function step() {
+    // update the canvas when a video proceeds to next frame
     if (tweak_active.value) {
-        // ctx_tweak.value.rotate((90 * Math.PI) / 180);
-        ctx_tweak.value.drawImage(
-            video.value,
-            0,
-            0,
-            canvas_tweak.value.width,
-            canvas_tweak.value.height
-        );
+        if (video_is_portrait.value) {
+            ctx_tweak.value.save();
+            ctx_tweak.value.translate(0, canvas_tweak.value.height);
+            ctx_tweak.value.rotate((-90 * Math.PI) / 180);
+            ctx_tweak.value.drawImage(video.value, 0, 0);
+            ctx_tweak.value.restore();
+        } else {
+            ctx_tweak.value.drawImage(video.value, 0, 0);
+        }
         tweakContrast();
     } else if (paint_active.value) {
-        // update the canvas when a video proceeds to next frame
-        ctx_result.value.drawImage(
-            video.value,
-            0,
-            0,
-            canvas_result.value.width,
-            canvas_result.value.height
-        );
+        // ctx_result.value.drawImage(
+        //     video.value,
+        //     0,
+        //     0,
+        //     canvas_result.value.width,
+        //     canvas_result.value.height
+        // );
+        if (video_is_portrait.value) {
+            ctx_result.value.save();
+            ctx_result.value.translate(0, canvas_result.value.height);
+            ctx_result.value.rotate((-90 * Math.PI) / 180);
+            ctx_result.value.drawImage(video.value, 0, 0);
+            ctx_result.value.restore();
+        } else {
+            ctx_result.value.drawImage(video.value, 0, 0);
+        }
     }
     animation_handle.value = video.value.requestVideoFrameCallback(step);
 }

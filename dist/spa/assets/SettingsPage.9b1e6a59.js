@@ -1,5 +1,5 @@
-import { Q as QPage } from "./QPage.03328d3c.js";
-import { _ as _export_sfc, n as openBlock, ad as createBlock, a8 as withCtx, v as createBaseVNode, x as toDisplayString, y as unref } from "./index.ed8ee536.js";
+import { Q as QPage } from "./QPage.8b2cb88f.js";
+import { _ as _export_sfc, n as openBlock, ad as createBlock, a8 as withCtx, v as createBaseVNode, x as toDisplayString, y as unref } from "./index.2ed42a4e.js";
 const _sfc_main = {
   __name: "SettingsPage",
   setup(__props) {
@@ -21,4 +21,4 @@ const _sfc_main = {
 };
 var SettingsPage = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "SettingsPage.vue"]]);
 export { SettingsPage as default };
-//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiU2V0dGluZ3NQYWdlLjA4OWVjNTFiLmpzIiwic291cmNlcyI6WyIuLi8uLi8uLi9zcmMvcGFnZXMvU2V0dGluZ3NQYWdlLnZ1ZSJdLCJzb3VyY2VzQ29udGVudCI6WyI8dGVtcGxhdGU+XG4gICAgPHEtcGFnZSBjbGFzcz1cImZsZXggY29sdW1uXCIgc3R5bGU9XCJhbGlnbi1pdGVtczogY2VudGVyXCI+XG4gICAgICAgIDxzZWN0aW9uPlxuICAgICAgICAgICAgPGg0Pnt7IGFwcGluZm8ucHJvZHVjdE5hbWUgfX08L2g0PlxuICAgICAgICA8L3NlY3Rpb24+XG4gICAgPC9xLXBhZ2U+XG48L3RlbXBsYXRlPlxuXG48c2NyaXB0IHNldHVwPlxuY29uc3QgYXBwaW5mbyA9IHByb2Nlc3MuZW52LmFwcGluZm87XG48L3NjcmlwdD5cbiJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7OztBQVNBLFVBQU0sVUFBVTs7Ozs7Ozs7Ozs7Ozs7Ozs7OyJ9
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiU2V0dGluZ3NQYWdlLjliMWU2YTU5LmpzIiwic291cmNlcyI6WyIuLi8uLi8uLi9zcmMvcGFnZXMvU2V0dGluZ3NQYWdlLnZ1ZSJdLCJzb3VyY2VzQ29udGVudCI6WyI8dGVtcGxhdGU+XG4gICAgPHEtcGFnZSBjbGFzcz1cImZsZXggY29sdW1uXCIgc3R5bGU9XCJhbGlnbi1pdGVtczogY2VudGVyXCI+XG4gICAgICAgIDxzZWN0aW9uPlxuICAgICAgICAgICAgPGg0Pnt7IGFwcGluZm8ucHJvZHVjdE5hbWUgfX08L2g0PlxuICAgICAgICA8L3NlY3Rpb24+XG4gICAgPC9xLXBhZ2U+XG48L3RlbXBsYXRlPlxuXG48c2NyaXB0IHNldHVwPlxuY29uc3QgYXBwaW5mbyA9IHByb2Nlc3MuZW52LmFwcGluZm87XG48L3NjcmlwdD5cbiJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7OztBQVNBLFVBQU0sVUFBVTs7Ozs7Ozs7Ozs7Ozs7Ozs7OyJ9
