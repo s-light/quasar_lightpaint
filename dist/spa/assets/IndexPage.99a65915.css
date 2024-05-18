@@ -69,12 +69,12 @@ ul li .info[data-v-b693a684] {
     margin: 0 0.8rem;
 }
 
-video[data-v-55e6ad42],
-canvas[data-v-55e6ad42] {
+video[data-v-a1131ab8],
+canvas[data-v-a1131ab8] {
     margin: 1rem;
     border: solid 1px hsl(250, 100%, 50%);
 }
-.flex-container[data-v-55e6ad42] {
+.flex-container[data-v-a1131ab8] {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -84,12 +84,12 @@ canvas[data-v-55e6ad42] {
     /* width: 100%; */
     /* height: 100%; */
 }
-.flex-column[data-v-55e6ad42] {
+.flex-column[data-v-a1131ab8] {
     flex-direction: column;
 }
 
 /* .flex-item:nth-child(1) */
-.flex-container[data-v-55e6ad42] > * {
+.flex-container[data-v-a1131ab8] > * {
     order: 0;
     flex: 0 1 auto;
     align-self: auto;
@@ -100,19 +100,40 @@ canvas[data-v-55e6ad42] {
 .flex-container > canvas {
     flex-grow: 1;
 } */
-.flex-container > video[data-v-55e6ad42],
-.flex-container > canvas#tweak[data-v-55e6ad42] {
+.flex-container > video[data-v-a1131ab8],
+.flex-container > canvas#tweak[data-v-a1131ab8] {
     max-width: 32vw;
     max-height: 40vh;
 }
-.flex-container > canvas#result[data-v-55e6ad42] {
+.flex-container > canvas#result[data-v-a1131ab8] {
     max-width: 67vw;
     max-height: 80vh;
 }
 @media screen and (orientation: landscape) {
-.video-portrait .flex-container > video[data-v-55e6ad42] {
+.video-portrait .flex-container[data-v-a1131ab8] {
+        align-items: end;
+        position: relative;
+}
+.video-portrait .flex-container > video[data-v-a1131ab8] {
         transform: rotate(-90deg);
         max-height: 32vw;
         max-width: 40vh;
+        position: absolute;
+        top: calc(32vh - 40vw);
+        right: calc((32vw - 40vh) * 0.54);
+}
+}
+@media screen and (orientation: portrait) {
+.video-portrait .flex-container[data-v-a1131ab8] {
+        /* align-items: end; */
+        position: relative;
+}
+.video-portrait .flex-container > video[data-v-a1131ab8] {
+        /* transform: rotate(-90deg); */
+        /* max-height: 32vw; */
+        /* max-width: 40vh; */
+        /* position: absolute; */
+        /* top: calc(32vh - 40vw); */
+        /* right: calc((32vw - 40vh) * 0.54); */
 }
 }
