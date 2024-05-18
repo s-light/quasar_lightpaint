@@ -70,10 +70,17 @@ canvas {
 }
 
 @media screen and (orientation: landscape) {
+    .video-portrait .flex-container {
+        align-items: end;
+        position: relative;
+    }
     .video-portrait .flex-container > video {
         transform: rotate(-90deg);
         max-height: 32vw;
         max-width: 40vh;
+        position: absolute;
+        top: calc(32vh - 40vw);
+        right: calc((32vw - 40vh) * 0.54);
     }
 }
 </style>
@@ -118,8 +125,11 @@ function test(event) {
 const video_constraints = {
     width: { min: 800, ideal: 1920 },
     height: { min: 600, ideal: 1080 },
-    // width: { min: 500, ideal: 500 },
-    // height: { min: 800, ideal: 1920 },
+    // ffmpeg -f lavfi -i testsrc=size=1080x1920 -f v4l2 -vcodec rawvideo -pixel_format yuv420p -framerate 15 -video_size 1080x1920 /dev/video61
+    // width: { ideal: 1080 },
+    // height: { ideal: 1920 },
+    // width: { min: 1, max: 1080 },
+    // height: { min: 1100, max: 2000 },
     frameRate: { max: 30 },
     facingMode: { ideal: "environment" },
 };
@@ -135,20 +145,20 @@ function generate_filename(title = "lightpainting", ext = "png") {
 }
 
 onMounted(() => {
-    console.log("onMounted");
+    // console.log("onMounted");
     // el.value; // <div>
     setup_canvas();
     setup_cam();
     start_cam();
     try {
-        console.log("add global event listener");
+        // console.log("add global event listener");
         document.addEventListener("keydown", handleGlobalKeydown);
     } catch (error) {
         console.log(error);
     }
 });
 onUnmounted(() => {
-    console.log("onUnmounted");
+    // console.log("onUnmounted");
     try {
         console.log("remove global event listener");
         document.removeEventListener("keydown", handleGlobalKeydown);
@@ -227,16 +237,22 @@ function setup_cam() {
     video.value.addEventListener("loadeddata", video_load_callback, false);
 }
 
-screen.addEventListener("orientationchange", () => {
-    console.log(`The orientation of the screen is: ${screen.orientation}`);
-    if (screen.orientation.startWith("landscape")) {
+function handleOrientationChange(event) {
+    console.log("handleOrientationChange", screen.orientation);
+    if (screen.orientation.type.startsWith("landscape")) {
         device_is_landscape.value = true;
     } else {
         // device in landscape mode
         device_is_landscape.value = false;
     }
-    video_load_callback();
-});
+    console.log("device_is_landscape", device_is_landscape.value);
+    if (video_track.value) {
+        video_load_callback();
+    }
+}
+screen.addEventListener("orientationchange", handleOrientationChange);
+handleOrientationChange();
+
 watch(video_active, async (newValue, oldValue) => {
     if (newValue) {
         start_cam();
