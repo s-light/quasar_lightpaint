@@ -83,6 +83,20 @@ canvas {
         right: calc((32vw - 40vh) * 0.54);
     }
 }
+@media screen and (orientation: portrait) {
+    .video-portrait .flex-container {
+        /* align-items: end; */
+        position: relative;
+    }
+    .video-portrait .flex-container > video {
+        /* transform: rotate(-90deg); */
+        /* max-height: 32vw; */
+        /* max-width: 40vh; */
+        /* position: absolute; */
+        /* top: calc(32vh - 40vw); */
+        /* right: calc((32vw - 40vh) * 0.54); */
+    }
+}
 </style>
 
 <script setup>
@@ -237,8 +251,7 @@ function setup_cam() {
     video.value.addEventListener("loadeddata", video_load_callback, false);
 }
 
-function handleOrientationChange(event) {
-    console.log("handleOrientationChange", screen.orientation);
+function update_device_is_landscape() {
     if (screen.orientation.type.startsWith("landscape")) {
         device_is_landscape.value = true;
     } else {
@@ -246,12 +259,17 @@ function handleOrientationChange(event) {
         device_is_landscape.value = false;
     }
     console.log("device_is_landscape", device_is_landscape.value);
+}
+
+function handleOrientationChange(event) {
+    console.log("handleOrientationChange", screen.orientation);
+    update_device_is_landscape();
     if (video_track.value) {
         video_load_callback();
     }
 }
 screen.addEventListener("orientationchange", handleOrientationChange);
-handleOrientationChange();
+update_device_is_landscape();
 
 watch(video_active, async (newValue, oldValue) => {
     if (newValue) {
@@ -299,6 +317,7 @@ function video_load_callback() {
 
     video_is_portrait.value = track_settings.height > track_settings.width;
     console.log("video_is_portrait", video_is_portrait.value);
+    update_device_is_landscape();
 
     if (video_is_portrait.value && device_is_landscape.value) {
         canvas_tweak.value.height = track_settings.width;
@@ -326,7 +345,7 @@ function video_load_callback() {
 function step() {
     // update the canvas when a video proceeds to next frame
     if (tweak_active.value) {
-        if (video_is_portrait.value) {
+        if (video_is_portrait.value && device_is_landscape.value) {
             ctx_tweak.value.save();
             ctx_tweak.value.translate(0, canvas_tweak.value.height);
             ctx_tweak.value.rotate((-90 * Math.PI) / 180);
@@ -344,7 +363,7 @@ function step() {
         //     canvas_result.value.width,
         //     canvas_result.value.height
         // );
-        if (video_is_portrait.value) {
+        if (video_is_portrait.value && device_is_landscape.value) {
             ctx_result.value.save();
             ctx_result.value.translate(0, canvas_result.value.height);
             ctx_result.value.rotate((-90 * Math.PI) / 180);
