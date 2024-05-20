@@ -117,15 +117,17 @@ const video = ref();
 const media_stream = ref();
 const video_track = ref();
 const video_active = ref(true);
+
 const video_is_portrait = ref(false);
 const device_is_landscape = ref(true);
+const orientationEvents = ref([]);
 
 const canvas_result = ref();
 const ctx_result = ref();
 
 const canvas_tweak = ref();
 const ctx_tweak = ref();
-const tweak_active = ref(true);
+const tweak_active = ref(false);
 const tweak_lum = ref(0.8);
 
 const paint_active = ref(false);
@@ -164,22 +166,28 @@ onMounted(() => {
     setup_canvas();
     setup_cam();
     start_cam();
-    try {
-        // console.log("add global event listener");
-        document.addEventListener("keydown", handleGlobalKeydown);
-    } catch (error) {
-        console.log(error);
-    }
+
+    document.addEventListener("keydown", handleGlobalKeydown);
+    // https://developer.mozilla.org/en-US/docs/Web/API/ScreenOrientation/change_event
+    screen.orientation.addEventListener("change", handleScreenOrientationChange);
+
+    update_device_is_landscape();
 });
 onUnmounted(() => {
     // console.log("onUnmounted");
     try {
-        console.log("remove global event listener");
+        console.log("remove event listener..");
         document.removeEventListener("keydown", handleGlobalKeydown);
+        screen.orientation.removeEventListener("change", handleScreenOrientationChange);
     } catch (error) {
         console.log(error);
     }
 });
+
+function handleScreenOrientationChange(event) {
+    console.log("screen.orientation 'change'", event);
+    handleOrientationChange();
+}
 
 function handleGlobalKeydown(event) {
     console.log("global keydown", event);
@@ -268,8 +276,6 @@ function handleOrientationChange(event) {
         video_load_callback();
     }
 }
-screen.addEventListener("orientationchange", handleOrientationChange);
-update_device_is_landscape();
 
 watch(video_active, async (newValue, oldValue) => {
     if (newValue) {
