@@ -6,7 +6,7 @@
             <q-tooltip> 'r' to toggle painting</q-tooltip>
         </q-toggle>
         <q-btn
-            size="3vh"
+            size="2.5vh"
             padding="xs"
             color="negative"
             round
@@ -24,7 +24,7 @@
         <!--
                 @mouseleave="paint_active = false" -->
         <q-btn
-            size="3vh"
+            size="2.5vh"
             padding="xs"
             color="primary"
             round
@@ -33,10 +33,24 @@
         >
             <q-tooltip>'c' to clear painting</q-tooltip>
         </q-btn>
-        <q-btn size="3vh" padding="xs" color="primary" round icon="save" @click="$emit('save')">
+        <q-btn size="2.5vh" padding="xs" color="primary" round icon="save" @click="$emit('save')">
             <q-tooltip>'s' to save current painting to memory</q-tooltip>
         </q-btn>
-        <q-slider v-model="tweak_lum" :min="-5.0" :max="2.0" :step="0" />
+        <q-btn
+            size="2.5vh"
+            padding="xs"
+            round
+            @click="$q.fullscreen.toggle()"
+            :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"
+        >
+            <q-tooltip>toggle full screen mode</q-tooltip>
+        </q-btn>
+        <!--
+            color="primary"
+            :label="$q.fullscreen.isActive ? 'Exit Fullscreen' : 'Go Fullscreen'"
+        -->
+
+        <q-slider v-model="tweak_lum" :min="-5.0" :max="2.0" :step="0" :disable="!tweak_active" />
         <!--  -->
     </div>
 </template>
@@ -50,16 +64,16 @@
     align-content: stretch;
     align-items: center;
 
-    max-width: 50rem;
+    max-width: 60rem;
 }
 
 .controls > * {
-    margin: 0 0.8rem;
+    margin: 0 0.4rem;
 }
 </style>
 
 <script setup>
-import { useQuasar } from "quasar";
+import { AppFullscreen, useQuasar } from "quasar";
 const $q = useQuasar();
 
 // const props = defineProps({
@@ -75,4 +89,24 @@ const paint_active = defineModel("paint_active", { type: Boolean, required: true
 const tweak_lum = defineModel("tweak_lum", { type: Number, required: true });
 
 const emit = defineEmits(["clear", "save"]);
+
+// Requesting fullscreen mode:
+$q.fullscreen
+    .request()
+    .then(() => {
+        // success!
+    })
+    .catch((err) => {
+        // oh, no!!!
+    });
+
+// Exiting fullscreen mode:
+$q.fullscreen
+    .exit()
+    .then(() => {
+        // success!
+    })
+    .catch((err) => {
+        // oh, no!!!
+    });
 </script>
